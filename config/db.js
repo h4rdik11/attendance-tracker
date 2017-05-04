@@ -1,3 +1,3 @@
 //configuring database
 
-module.exports = { url : "http://localhost:20712" };
+module.exports = { url : "mongodb://root:H4rdik@1781@ds127101.mlab.com:27101/attendance_db" };
