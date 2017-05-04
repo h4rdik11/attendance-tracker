@@ -7,7 +7,7 @@ var mongoose = require("mongoose");
 
 /* Configurations */
 var db = require("./config/db");
-var port = 3030;
+var port = 3000;
 mongoose.connect(db.url, function(err, db){
   if(!err){
     console.log("Connection to database established.");
