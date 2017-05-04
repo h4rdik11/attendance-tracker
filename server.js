@@ -3,13 +3,16 @@ var express = require("express");
 var app = express();
 var bodyParser = require("body-parser");
 var cors = require("cors");
+var mongoose = require("mongoose");
 
 /* Configurations */
 var db = require("./config/db");
-var port = 8080;
-mongoose.connect(db.url, funtion(err){
+var port = 3030;
+mongoose.connect(db.url, function(err, db){
   if(!err){
-    console.log("Connection to database successful.");
+    console.log("Connection to database established.");
+  }else{
+    console.log(err);
   }
 }); //connecting to database
 
@@ -20,7 +23,7 @@ app.use(cors());
 //adding path to static files
 app.use(express.static(__dirname+'/public'));
 //adding routes
-require('./app/routes')(app);
+//require('./app/routes')(app);
 
 //start app
 app.listen(port, function(){
@@ -28,4 +31,4 @@ app.listen(port, function(){
 });
 
 //expose app
-exports = modeule.exports = app;
+exports = module.exports = app;
