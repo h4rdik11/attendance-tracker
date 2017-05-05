@@ -8,8 +8,9 @@ var contactValid = [
     message   : "Contact number should be 10 digit long."
   })
 ];
-module.exports = mongoose.model('User',{
-  name : { type : String, default : '', unique : true, required : true, dropDups : true },
+
+var schema = mongoose.Schema({
+  name : { type : String, default : '', required : true },
   college : { type : String, default : '', required : true },
   course : { type : String, required : true, default : '' },
   sem : { type : Number, required : true, default : '' },
@@ -17,3 +18,4 @@ module.exports = mongoose.model('User',{
   contact : {type : String, default : '', validate : contactValid },
   password : { type : String, required : true }
 });
+module.exports = mongoose.model('User', schema);

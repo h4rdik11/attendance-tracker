@@ -1,4 +1,4 @@
-var user = require("./models/user");
+var User = require("./models/user");
 
 module.exports = function(app){
 
@@ -6,7 +6,7 @@ module.exports = function(app){
 
   //getting user
   app.get('/api/get-user', function(req, res){
-    user.find({}).exec(function(err, user){
+    User.find({}).exec(function(err, user){
       if(err){
         res.send("Cannot find the user.");
       }else{
@@ -16,15 +16,19 @@ module.exports = function(app){
   });
 
   //creating user
-  app.post('/api/create-user', function(req, res){
-    var u = new user(req.body);
-    u.save();
+  app.post('/api/add-user', function(req, res){
+    //res.send(req.body.sem);
+    var u = new User(req.body);
+    u.save(function(err){
+      if(err) res.end(JSON.stringify(err));
+      else res.send("Done !")
+    });
     res.status(200);
   });
 
   /* Frontend Routes */
   app.get('*', function(req, res){
-    res.sendfile("./public/views/index.html");
+    res.sendFile("./public/views/index.html");
   });
 
 }
