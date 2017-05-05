@@ -22,8 +22,9 @@ app.use(cors());
 
 //adding path to static files
 app.use(express.static(__dirname+'/public'));
+
 //adding routes
-//require('./app/routes')(app);
+require('./app/routes')(app);
 
 //start app
 app.listen(port, function(){
