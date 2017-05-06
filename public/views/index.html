@@ -1,0 +1,55 @@
+<style>
+
+  .login-block{ margin-top: 20%; }
+  .login-block .content{ padding: 2% 10% 5% 10%; }
+  .login-block .header h2{ text-align: center; padding-top: 5%}
+  .login-block .footer{ text-align: center; border-top: 0.5px solid #E5E5E5; padding: 3%; }
+  .form-group button{ margin-top: 5% !important;  }
+  .trouble-link { text-align: center; }
+
+</style>
+
+<div class="container">
+
+  <div class="row">
+
+    <div class="col-md-4"></div>
+    <div class="col-md-4">
+
+      <div class="login-block mdl-shadow--4dp">
+        <div class="header">
+          <h2>Logo</h2>
+        </div>
+        <div class="content">
+          <form ="login-form" ng-submit="login()">
+            <div class="form-group">
+              <input class="form-control" type="text" ng-model="userLogin.id" placeholder="User Name or E-Mail">
+            </div>
+            <div class="form-group">
+              <input class="form-control" type="password" ng-model="userLogin.password" placeholder="Password">
+            </div>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox">
+                Remember me on this computer.
+              </label>
+            </div>
+            <div class="form-group">
+              <button type="submit" class="form-control btn btn-primary">Sign In</button>
+            </div>
+            <div class="trouble-link">
+              <a ui-sref="/register" class="btn btn-link">Trouble logging in ?</a>
+            </div>
+          </form>
+        </div>
+        <div class="footer">
+          <span><strong>New here ?</strong><a ui-sref="/register" class="btn btn-link">Sign Up now.</a></span>
+        </div>
+      </div>
+
+    </div>
+    <div class="col-md-4"></div>
+
+  </div>
+
+</div>

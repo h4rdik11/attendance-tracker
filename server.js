@@ -24,7 +24,7 @@ app.use(cors());
 app.use(express.static(__dirname+'/public'));
 
 //adding routes
-require('./app/routes')(app);
+require('./app/route')(app);
 
 //start app
 app.listen(port, function(){

@@ -11,11 +11,11 @@ var contactValid = [
 
 var schema = mongoose.Schema({
   name : { type : String, default : '', required : true },
-  college : { type : String, default : '', required : true },
-  course : { type : String, required : true, default : '' },
-  sem : { type : Number, required : true, default : '' },
+  college : { type : String, default : '' },
+  course : { type : String, default : '' },
+  sem : { type : Number, default : '' },
+  uname : { type : String, required : true, unique : true, dropDups : true },
   email : { type : String, required : true, unique : true, dropDups : true },
-  contact : {type : String, default : '', validate : contactValid },
   password : { type : String, required : true }
 });
 module.exports = mongoose.model('User', schema);

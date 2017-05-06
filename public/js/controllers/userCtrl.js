@@ -1,5 +1,6 @@
 app.controller('UserController', function($scope, $http){
 
+    alert("hello from user");
     $scope.user = {};
     $scope.addUser = function(){
       // alert($scope.user.name);
