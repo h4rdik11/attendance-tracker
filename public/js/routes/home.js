@@ -19,8 +19,11 @@ app.config(['$urlRouterProvider', '$stateProvider', function($urlRouterProvider,
 }]);
 
 app.config(['$authProvider', function($authProvider){
-  $authProvider.signupUrl = "http://localhost:3030/api/add-user";
-  $authProvider.loginUrl = "http://localhost:3030/api/login";
+  var host = location.host;
+  var protocol = location.protocol;
+
+  $authProvider.signupUrl = protocol+"//"+host+"/api/add-user";
+  $authProvider.loginUrl = protocol+"//"+host+"/api/login";
   $authProvider.google({
     clientId: 'Google Client ID'
   });
