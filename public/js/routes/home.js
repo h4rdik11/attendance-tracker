@@ -10,6 +10,11 @@ app.config(['$urlRouterProvider', '$stateProvider', function($urlRouterProvider,
     url: '/register',
     templateUrl: '../views/home/register.html',
     controller: 'HomeController'
+  })
+  .state('/user-dashboard', {
+    url:'/user-dashboard',
+    templateUrl: '../views/user/index.html',
+    controller: 'UserController'
   });
 }]);
 

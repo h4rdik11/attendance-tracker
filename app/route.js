@@ -1,14 +1,47 @@
 var User = require("./models/user");
 var jwt = require("jwt-simple");
 var moment = require("moment");
+var config = require("../config/db");
 
 module.exports = function(app){
 
   /* Server Routes */
 
+  //authenticate user
+  app.post('/api/login', function(req, res){
+
+    User.findOne({$or:[{email : req.body.id},{uname: req.body.id}]}, function(err, user){
+      if(user != null){
+          if(req.body.password == user.password){
+            res.status(200).send({token: createToken(user), msg : "1"});
+          }else{
+            res.send({msg: "Incorrect password."});
+          }
+      }else{
+        res.send({msg: "User id or Email incorrect."});
+      }
+    });
+  });
+
+  //token authentication middleware
+  app.use( function(req, res, next){
+    var token = req.body.token || req.query.token || req.header['x-access-token'];
+    if(token){
+      var decoded = jwt.decode(token, config.secret, true);
+      if(decoded){
+        req.token = token;
+        req.decoded = decoded;
+        next();
+      }
+      else res.send({success:false, message: "Failed to authenticate the token."});
+    }else{
+      res.status(403).send({ success:false, message:"Token exprired or no token provided." });
+    }
+  });
+
   //getting user
   app.get('/api/get-user', function(req, res){
-    User.find({}).exec(function(err, user){
+    User.findOne({_id: req.decoded.sub,}).select('-password').exec(function(err, user){
       if(err){
         res.send("Cannot find the user.");
       }else{
@@ -33,25 +66,9 @@ module.exports = function(app){
     });
   });
 
-  //login user
-  app.post('/api/login', function(req, res){
-
-    User.findOne({$or:[{email : req.body.id},{uname: req.body.id}]}, function(err, user){
-      if(user != null){
-          if(req.body.password == user.password){
-            res.status(200).send({token: createToken(user), msg : "1"});
-          }else{
-            res.send({msg: "Incorrect password."});
-          }
-      }else{
-        res.send({msg: "User id or Email incorrect."});
-      }
-    });
-  });
-
   /* Frontend Routes */
   app.get('*', function(req, res){
-    res.sendFile("../public/views/index.html");
+      res.sendFile("../public/views/index.html");
   });
 
 }
@@ -62,5 +79,5 @@ function createToken(user){
     ist: moment().unix(),
     exp: moment().add(14, 'days').unix()
   };
-  return jwt.encode(payload, 'H4rdik@1781');
+  return jwt.encode(payload, config.secret);
 }

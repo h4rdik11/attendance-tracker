@@ -1,6 +1,6 @@
-app.controller('UserController', function($scope, $http){
+app.controller('UserController', function($scope, $http, $auth, $location){
 
-    alert("hello from user");
+    if(! $auth.isAuthenticated()) $location.url('/');
     $scope.user = {};
     $scope.addUser = function(){
       // alert($scope.user.name);
@@ -8,5 +8,17 @@ app.controller('UserController', function($scope, $http){
         alert(response.data);
       });
     };
+
+    $scope.loggedUser = {};
+    $scope.getUser = function(){
+      $http.get("http://localhost:3030/api/get-user?token="+$auth.getToken()).then(function(response){
+        $scope.loggedUser = response.data;
+      });
+    };
+
+    $scope.logout = function(){
+      $auth.logout();
+      $location.url("/");
+    }
 
 });

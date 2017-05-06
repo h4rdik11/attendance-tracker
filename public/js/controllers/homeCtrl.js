@@ -1,4 +1,6 @@
-app.controller('HomeController', function($scope, $http, $auth){
+app.controller('HomeController', function($scope, $http, $auth, $location){
+
+  if($auth.isAuthenticated()) $location.url("/user-dashboard");
 
   $scope.user = {};
   $scope.addUser = function(){
@@ -17,7 +19,7 @@ app.controller('HomeController', function($scope, $http, $auth){
     $auth.login($scope.userLogin).then(function(response){
       if(response.data.msg == "1"){
         $auth.setToken(response.data.token);
-        window.location.href = "/";
+        $location.url("/user-dashboard");
       }else{
         alert(response.data.msg);
       }
