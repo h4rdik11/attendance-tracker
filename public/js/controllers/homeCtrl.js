@@ -1,6 +1,5 @@
 app.controller('HomeController', function($scope, $http, $auth, $location){
 
-  alert(location.protocol);
   if($auth.isAuthenticated()) $location.url("/user-dashboard");
 
   $scope.user = {};
