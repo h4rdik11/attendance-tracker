@@ -11,6 +11,13 @@
     <link rel="stylesheet" href="libs/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/style.css">
 
+    <!-- Bootstrap Date Time Picker -->
+    <link rel="stylesheet" href="libs/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+
+    <!-- Progress Bar -->
+    <link rel="stylesheet" href="libs/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <script src="libs/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js" charset="utf-8"></script>
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="libs/font-awesome/css/font-awesome.min.css">
 
@@ -31,10 +38,13 @@
     <script src="libs/ui-router.min.js"></script>
 
     <!-- Angular Customs -->
-    <script type="text/javascript" src="js/app.js"></script>
+    <script type="text/javascript" src="js/userApp.js"></script>
     <script type="text/javascript" src="js/routes/user.js"></script>
     <script type="text/javascript" src="js/controllers/userCtrl.js"></script>
     <script type="text/javascript" src="libs/satellizer/dist/satellizer.min.js"></script>
+
+    <!-- Rount Progress Bar -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-svg-round-progressbar/0.4.4/roundProgress.min.js"></script>
 
     <!-- Custom Styles -->
     <style media="screen">
@@ -69,17 +79,15 @@
         <a class="mdl-navigation__link" href="" ng-click="logout()">Logout</a>
       </nav>
     </div>
-    <main class="mdl-layout__content">
+    <main class="mdl-layout__content container mdl-shadow--4dp">
       <div class="page-content">
-        <div ui-view>
-          <div class="container">
-
-          </div>
-        </div>
+        <div ui-view></div>
       </div>
     </main>
   </div>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="libs/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+
   </body>
 </html>

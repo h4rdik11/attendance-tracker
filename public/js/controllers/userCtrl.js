@@ -26,4 +26,36 @@ app.controller('UserController', function($scope, $http, $auth, $location){
       });
     };
 
+    $scope.showMain = true;
+    $scope.showClassmates = false;
+    $scope.showDaily = false;
+    $scope.showMonthly = false;
+    $scope.showOverall = false;
+    $scope.changeView = function(val){
+      if(val === "classmate"){
+        $scope.showMain = false;
+        $scope.showClassmates = true;
+        $scope.showDaily = false;
+        $scope.showMonthly = false;
+        $scope.showOverall = false;
+      }else if(val === "daily"){
+        $scope.showMain = false;
+        $scope.showClassmates = false;
+        $scope.showDaily = true;
+        $scope.showMonthly = false;
+        $scope.showOverall = false;
+      }else if(val === "monthly"){
+        $scope.showMain = false;
+        $scope.showClassmates = false;
+        $scope.showDaily = false;
+        $scope.showMonthly = true;
+        $scope.showOverall = false;
+      }else{
+        $scope.showMain = false;
+        $scope.showClassmates = false;
+        $scope.showDaily = false;
+        $scope.showMonthly = false;
+        $scope.showOverall = true;
+      }
+    }
 });

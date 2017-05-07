@@ -1,150 +1,299 @@
 <style media="screen">
 
-  .row{ margin-top: 5%}
+  .main-tabs{ padding: 5% 0 5% 0; border-bottom: 1px solid #E0E0E0; }
   .btn .card-block{ width: 100%; }
   .card-block{ color: #fff; padding: 0% 4% 0% 4%; width: 100%; margin-bottom: 3%}
-  .card-block #card-icon { font-size: 25px;}
-  .card-block #card-text{ font-size: 11px; font-weight: bold;}
+  .card-block #card-icon { font-size: 20px;}
+  .card-block #card-text{ font-size: 9px; font-weight: bold;}
   .card-block .head{ padding: 10% }
-  .col-xs-4{ padding: 0 1% 0 2%;}
-  #divider{ border-top: 1px solid #E0E0E0; margin-top: 3%}
+  .col-xs-3{ padding: 0 1% 0 2%;}
+  #divider{ border-top: 1px solid #E0E0E0; margin-top: 2%}
 
-  .dash-view .dash-head{ padding-bottom: 2%}
+  .dash-view{ margin-top: 10%}
+  .dash-view .dash-head h5{ margin-bottom: 0%; border-bottom: 1px solid #E0E0E0; padding-bottom: 1%}
+  .dash-view .dash-body .row{ margin-top: 2%}
+
+  .percent-block{ margin-top: 10% !important; }
+  .percent-block .percent-text h3{ margin-bottom: 2% }
+  .percent-block .percent-text small{ font-size: 12px; color: #949494;}
+
+  .progressbar-wrapper{ position:relative; font-size:17px; width: 100%; height: 100% }
+  .progressbar-percent{ position: absolute; width: 100%; text-align: center !important; top: 40% }
 </style>
 
 
-<div class="container">
+<div class="row main-tabs">
 
-  <div class="row">
-
-    <div class="col-xs-4">
-      <div class="btn card-block mdl-shadow--4dp mdl-color--red-500">
-        <div class="head">
-          <center><span id="card-icon"><i class="fa fa-users" aria-hidden="true"></i></span></center>
-          <span id="card-text">Classmates (20)</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-xs-4">
-      <div class="btn card-block mdl-shadow--4dp mdl-color--cyan-500">
-        <div class="head">
-          <center><span id="card-icon"><i class="fa fa-calendar-check-o" aria-hidden="true"></i></span></center>
-          <center><span id="card-text">Check Daily</span></center>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-xs-4">
-      <div class="btn card-block mdl-shadow--4dp mdl-color--blue-500">
-        <div class="head">
-          <center><span id="card-icon"><i class="fa fa-calendar" aria-hidden="true"></i></span></center>
-          <span id="card-text">Check Monthly</span>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <div id="divider"></div>
-
-  <div class="dash-view main-view">
-    <div class="dash-head page-header">
-      <h5>Attendance For : <strong>April</strong></h5>
-    </div>
-    <div class="dash-body">
-      <div class="row">
-
-        <div class="col-md-6">
-          <table class="table table-hover">
-            <caption><strong>Theory Attendance</strong></caption>
-            <thead>
-              <td><b>#</b></td>
-              <td><b>Subject Name</b></td>
-              <td><b>Attended</b></td>
-              <td><b>Total</b></td>
-            </thead>
-            <tbody>
-              <tr>
-                <td>1</td>
-                <td>DAA</td>
-                <td>5</td>
-                <td>5</td>
-              </tr>
-              <tr>
-                <td>1</td>
-                <td>DAA</td>
-                <td>5</td>
-                <td>5</td>
-              </tr>
-              <tr>
-                <td>1</td>
-                <td>DAA</td>
-                <td>5</td>
-                <td>5</td>
-              </tr>
-              <tr>
-                <td>1</td>
-                <td>DAA</td>
-                <td>5</td>
-                <td>5</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="col-md-6">
-          <table class="table table-hover">
-            <caption><strong>Lab Attendance</strong></caption>
-            <thead>
-              <td><b>#</b></td>
-              <td><b>Subject Name</b></td>
-              <td><b>Attended</b></td>
-              <td><b>Total</b></td>
-            </thead>
-            <tbody>
-              <tr>
-                <td>1</td>
-                <td>DAA</td>
-                <td>5</td>
-                <td>5</td>
-              </tr>
-              <tr>
-                <td>1</td>
-                <td>DAA</td>
-                <td>5</td>
-                <td>5</td>
-              </tr>
-              <tr>
-                <td>1</td>
-                <td>DAA</td>
-                <td>5</td>
-                <td>5</td>
-              </tr>
-              <tr>
-                <td>1</td>
-                <td>DAA</td>
-                <td>5</td>
-                <td>5</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
+  <div class="col-xs-3">
+    <div class="btn card-block mdl-shadow--4dp mdl-color--red-500" ng-click="changeView('classmate')">
+      <div class="head">
+        <center><span id="card-icon"><i class="fa fa-users" aria-hidden="true"></i></span></center>
+        <span id="card-text">Classmates(20)</span>
       </div>
     </div>
   </div>
 
-  <div class="dash-view classmate-view">
-
+  <div class="col-xs-3">
+    <div class="btn card-block mdl-shadow--4dp mdl-color--cyan-500" ng-click="changeView('daily')">
+      <div class="head">
+        <center><span id="card-icon"><i class="fa fa-calendar-times-o" aria-hidden="true"></i></span></center>
+        <center><span id="card-text">Check Daily</span></center>
+      </div>
+    </div>
   </div>
 
-  <div class="dash-view daily-view">
-
+  <div class="col-xs-3">
+    <div class="btn card-block mdl-shadow--4dp mdl-color--blue-500" ng-click="changeView('monthly')">
+      <div class="head">
+        <center><span id="card-icon"><i class="fa fa-calendar" aria-hidden="true"></i></span></center>
+        <span id="card-text">Check Monthly</span>
+      </div>
+    </div>
   </div>
 
-  <div class="dash-view monthly-view">
-
+  <div class="col-xs-3">
+    <div class="btn card-block mdl-shadow--4dp mdl-color--teal-500" ng-click="changeView('overall')">
+      <div class="head">
+        <center><span id="card-icon"><i class="fa fa-area-chart" aria-hidden="true"></i></span></center>
+        <span id="card-text">Check Overall</span>
+      </div>
+    </div>
   </div>
 
 </div>
+
+
+<div class="dash-view main-view" ng-show="showMain">
+  <div class="dash-head">
+    <center><h5>Attendance For : <strong>April</strong></h5></center>
+  </div>
+  <div class="dash-body">
+    <div class="row">
+
+      <div class="col-md-6">
+        <table class="table table-hover">
+          <caption><strong>Theory Attendance</strong></caption>
+          <thead>
+            <td><b>#</b></td>
+            <td><b>Subject Name</b></td>
+            <td><b>Attended</b></td>
+            <td><b>Total</b></td>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>DAA</td>
+              <td>5</td>
+              <td>5</td>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>DAA</td>
+              <td>5</td>
+              <td>5</td>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>DAA</td>
+              <td>5</td>
+              <td>5</td>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>DAA</td>
+              <td>5</td>
+              <td>5</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="col-md-6">
+        <table class="table table-hover">
+          <caption><strong>Lab Attendance</strong></caption>
+          <thead>
+            <td><b>#</b></td>
+            <td><b>Subject Name</b></td>
+            <td><b>Attended</b></td>
+            <td><b>Total</b></td>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>DAA</td>
+              <td>5</td>
+              <td>5</td>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>DAA</td>
+              <td>5</td>
+              <td>5</td>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>DAA</td>
+              <td>5</td>
+              <td>5</td>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>DAA</td>
+              <td>5</td>
+              <td>5</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <div id="divider"></div>
+
+    <div class="row percent-block">
+      <div class="col-xs-6 theory-percent">
+        <div class="row">
+          <div class="col-md-12">
+            <center>
+              <div class="progressbar-wrapper">
+                <div class="progressbar-percent ng-cloak">
+                  <span>Theory</span>
+                </div>
+                <round-progress
+                max="6"
+                current="5"
+                color="green"
+                bgcolor="#eaeaea"
+                radius="45"
+                stroke="5"
+                rounded="true"
+                clockwise="true"
+                responsive="responsive"
+                duration="800"
+                animation="easeInOutQuart"
+                animation-delay="0"
+                ></round-progress>
+              </div>
+            </center>
+          </div>
+          <div class="col-md-12 percent-text">
+            <center><h3>75%</h3><small>You can bunk 0 classes.</small></center>
+          </div>
+        </div>
+      </div>
+      <div class="col-xs-6 lab-percent">
+        <div class="row">
+          <div class="col-md-12">
+            <center>
+              <div class="progressbar-wrapper">
+                <div class="progressbar-percent ng-cloak">
+                  <span>Lab</span>
+                </div>
+                <round-progress
+                max="6"
+                current="5"
+                color="green"
+                bgcolor="#eaeaea"
+                radius="45"
+                stroke="5"
+                rounded="true"
+                clockwise="true"
+                responsive="responsive"
+                duration="800"
+                animation="easeInOutQuart"
+                animation-delay="0"
+                ></round-progress>
+              </div>
+            </center>
+          </div>
+          <div class="col-md-12 percent-text">
+            <center><h3>75%</h3><small>You can bunk 0 classes.</small></center>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="dash-view classmate-view" ng-show="showClassmates">
+
+  <table class="table table-hover">
+    <thead>
+      <td><strong>#</strong></td>
+      <td><strong>Name</strong></td>
+      <td><strong>Attended</strong></td>
+      <td><strong>Total</strong></td>
+      <td><strong>%</strong></td>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>Hardik Chuahan</td>
+        <td>5</td>
+        <td>5</td>
+        <td>100</td>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>Hardik Chuahan</td>
+        <td>5</td>
+        <td>5</td>
+        <td>100</td>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>Hardik Chuahan</td>
+        <td>5</td>
+        <td>5</td>
+        <td>100</td>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>Hardik Chuahan</td>
+        <td>5</td>
+        <td>5</td>
+        <td>100</td>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>Hardik Chuahan</td>
+        <td>5</td>
+        <td>5</td>
+        <td>100</td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+
+<div class="dash-view daily-view" ng-show="showDaily">
+  <div class="row">
+    <div class="col-md-5"></div>
+    <div class="col-md-2">
+      <div class="form-group">
+        <center><label>Select Date</label></center>
+        <input type="text" class="form-control datepicker" readonly>
+      </div>
+    </div>
+    <div class="col-md-5"></div>
+  </div>
+  <div id="divider"></div>
+</div>
+
+<div class="dash-view monthly-view" ng-show="showMonthly">
+
+</div>
+
+<div class="dash-view overall-view" ng-show="showOverall">
+
+</div>
+
+<script type="text/javascript">
+  $(window).ready(function(){
+    $('.datepicker').datepicker({
+      todayBtn: 'linked',
+      orientation: 'bottom right',
+      autoclose: true
+    });
+  });
+</script>
