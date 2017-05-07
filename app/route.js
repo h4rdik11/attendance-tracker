@@ -5,6 +5,11 @@ var config = require("../config/db");
 
 module.exports = function(app){
 
+  /* Frontend route befor authentication */
+  app.get('/main', function(req, res){
+      res.sendFile("public/views/index.html", {root: "."});
+  });
+
   /* Server Routes */
 
   //authenticate user
@@ -67,8 +72,9 @@ module.exports = function(app){
   });
 
   /* Frontend Routes */
-  app.get('*', function(req, res){
-      res.sendFile("../public/views/index.html");
+  app.get('/user', function(req,res){
+    // res.send(__dirname);
+    res.sendFile("public/views/user/index.html", { root: "." });
   });
 
 }

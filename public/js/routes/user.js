@@ -3,13 +3,7 @@ app.config(['$urlRouterProvider', '$stateProvider', function($urlRouterProvider,
   $stateProvider
   .state('/', {
     url: '/',
-    templateUrl : '../views/index.html',
-    controller: 'HomeController'
-  })
-  .state('/register',{
-    url: '/register',
-    templateUrl: '../views/home/register.html',
-    controller: 'HomeController'
+    templateUrl : '../views/user/home.html'
   });
 }]);
 

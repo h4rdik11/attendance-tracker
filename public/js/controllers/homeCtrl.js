@@ -1,6 +1,9 @@
 app.controller('HomeController', function($scope, $http, $auth, $location){
 
-  if($auth.isAuthenticated()) $location.url("/user-dashboard");
+  var protocol = location.protocol;
+  var host = location.host;
+
+  if($auth.isAuthenticated()) window.location.href = protocol+"//"+host+"/user?token="+$auth.getToken();
 
   $scope.user = {};
   $scope.addUser = function(){
@@ -19,7 +22,9 @@ app.controller('HomeController', function($scope, $http, $auth, $location){
     $auth.login($scope.userLogin).then(function(response){
       if(response.data.msg == "1"){
         $auth.setToken(response.data.token);
-        $location.url("/user-dashboard");
+        // $location.url("/user-dashboard");
+        window.location.href = protocol+"//"+host+"/user?token="+$auth.getToken();
+        // $location.url(protocol+"//"+host+"/user?token="+$auth.getToken());
       }else{
         alert(response.data.msg);
       }
