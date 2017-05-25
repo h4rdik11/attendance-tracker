@@ -19,6 +19,10 @@
 
   .progressbar-wrapper{ position:relative; font-size:17px; width: 100%; height: 100% }
   .progressbar-percent{ position: absolute; width: 100%; text-align: center !important; top: 40% }
+
+  .month-dropdown{ width: 430% }
+  .month-dropdown .row{ margin: 2% }
+  .month-dropdown .row a{ text-decoration: none;}
 </style>
 
 
@@ -268,24 +272,159 @@
 
 <div class="dash-view daily-view" ng-show="showDaily">
   <div class="row">
-    <div class="col-md-5"></div>
-    <div class="col-md-2">
+    <div class="col-md-4"></div>
+    <div class="col-md-4">
       <div class="form-group">
         <center><label>Select Date</label></center>
         <input type="text" class="form-control datepicker" readonly>
       </div>
     </div>
-    <div class="col-md-5"></div>
+    <div class="col-md-4"></div>
   </div>
   <div id="divider"></div>
+  <div class="row">
+
+    <div class="col-md-6">
+      <table class="table table-hover">
+        <caption><strong>Theory Attendance</strong></caption>
+        <thead>
+          <td><b>#</b></td>
+          <td><b>Subject Name</b></td>
+          <td><b>Attended</b></td>
+          <td><b>Total</b></td>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>DAA</td>
+            <td>5</td>
+            <td>5</td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>DAA</td>
+            <td>5</td>
+            <td>5</td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>DAA</td>
+            <td>5</td>
+            <td>5</td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>DAA</td>
+            <td>5</td>
+            <td>5</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col-md-6">
+      <table class="table table-hover">
+        <caption><strong>Lab Attendance</strong></caption>
+        <thead>
+          <td><b>#</b></td>
+          <td><b>Subject Name</b></td>
+          <td><b>Attended</b></td>
+          <td><b>Total</b></td>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>DAA</td>
+            <td>5</td>
+            <td>5</td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>DAA</td>
+            <td>5</td>
+            <td>5</td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>DAA</td>
+            <td>5</td>
+            <td>5</td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>DAA</td>
+            <td>5</td>
+            <td>5</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
 </div>
 
 <div class="dash-view monthly-view" ng-show="showMonthly">
-
+  <div class="row">
+    <div class="col-md-4"></div>
+    <div class="col-md-4">
+        <center>
+          <div class="input-group">
+            <input type="text" class="form-control" readonly>
+            <div class="input-group-btn">
+              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Month <span class="caret"></span></button>
+              <ul class="dropdown-menu dropdown-menu-right month-dropdown">
+                <div class="row">
+                  <div class="col-xs-4">
+                    <li><a href="#">January</a></li>
+                    <li><a href="#">February</a></li>
+                    <li><a href="#">March</a></li>
+                    <li><a href="#">April</a></li>
+                  </div>
+                  <div class="col-xs-4">
+                    <li><a href="#">May</a></li>
+                    <li><a href="#">June</a></li>
+                    <li><a href="#">July</a></li>
+                    <li><a href="#">August</a></li>
+                  </div>
+                  <div class="col-xs-4">
+                    <li><a href="#">September</a></li>
+                    <li><a href="#">October</a></li>
+                    <li><a href="#">November</a></li>
+                    <li><a href="#">December</a></li>
+                  </div>
+                </div>
+              </ul>
+            </div><!-- /btn-group -->
+          </div><!-- /input-group -->
+        </center>
+    </div>
+    <div class="col-md-4"></div>
+  </div>
 </div>
 
 <div class="dash-view overall-view" ng-show="showOverall">
-
+  <div class="row">
+    <div class="col-xs-3"></div>
+    <div class="col-xs-6">
+      <center>
+        <div class="input-group">
+          <input type="text" class="form-control" readonly>
+          <div class="input-group-btn">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Sem <span class="caret"></span></button>
+            <ul class="dropdown-menu dropdown-menu-right">
+              <li><a href="#">1</a></li>
+              <li><a href="#">2</a></li>
+              <li><a href="#">3</a></li>
+              <li><a href="#">4</a></li>
+              <li><a href="#">5</a></li>
+              <li><a href="#">6</a></li>
+            </ul>
+          </div>
+        </div>
+      </center>
+    </div>
+    <div class="col-xs-3"></div>
+  </div>
 </div>
 
 <script type="text/javascript">

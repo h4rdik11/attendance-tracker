@@ -13,7 +13,6 @@ app.controller('UserController', function($scope, $http, $auth, $location){
     $scope.user = {};
     $scope.user.token = $auth.getToken();
     $scope.addUser = function(){
-      // alert($scope.user.name);
       $http.post(protocol+"//"+host+"/api/add-user", $scope.user).then(function(response){
         alert(response.data);
       });
