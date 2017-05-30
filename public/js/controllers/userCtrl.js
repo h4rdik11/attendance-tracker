@@ -1,4 +1,4 @@
-app.controller('UserController', function($scope, $http, $auth, $location){
+app.controller('UserController', function($scope, $http, $auth, $location, $q){
 
     var host = location.host;
     var protocol = location.protocol;
@@ -20,48 +20,17 @@ app.controller('UserController', function($scope, $http, $auth, $location){
     $scope.attendance_theory = [];
     $scope.attendance_lab = [];
 
+    $scope.attendance_home = [];
+
+    $scope.hello = null;
     $scope.initFun = function(){
 
       //getting user info
       $http.get(protocol+"//"+host+"/api/get-user?token="+$auth.getToken()).then(function(response){
         $scope.loggedUser = response.data;
-        //getting theory subjects
-        $http.get(protocol+"//"+host+"/api/get-subject-theory?course="+$scope.loggedUser.course+"&sem="+$scope.loggedUser.sem+"&token="+$auth.getToken()).then(function(response){
-          $scope.subject_theory = response.data;
-          for(var i = 0; i < $scope.subject_theory.length; i++){
-              $scope.attendance_theory.push({
-                  "stud_id" : $scope.loggedUser._id,
-                  "sub_id" : $scope.subject_theory[i]._id,
-                  "date"  : $scope.user.date,
-                  "status" : false,
-                  "unscheduled" : false
-              });
-          }
-        });
-
-        //getting lab subjects
-        $http.get(protocol+"//"+host+"/api/get-subject-lab?course="+$scope.loggedUser.course+"&sem="+$scope.loggedUser.sem+"&token="+$auth.getToken()).then(function(response){
-          $scope.subject_lab = response.data;
-          for(var i = 0; i < $scope.subject_lab.length; i++){
-              $scope.attendance_lab.push({
-                  "stud_id" : $scope.loggedUser._id,
-                  "sub_id" : $scope.subject_lab[i]._id,
-                  "date"  : $scope.user.date,
-                  "status" : 0,
-                  "unscheduled" : 0
-              });
-          }
-        });
-
+        $scope.getSubTheory();
+        $scope.getSubLab();
         //getting attendance for home screen
-        $scope.theory_home = [];
-        $scope.lab_home = [];
-        $scope.theory_attended_home = 0;
-        $scope.theory_total_home = 0;
-        $scope.theory_avg = 0;
-        $scope.lab_attended_home = 0;
-        $scope.lab_total_home = 0;
-        $scope.lab_avg = 0;
         var d = new Date();
         var yr = d.getFullYear();
         var mn = d.getMonth();
@@ -69,27 +38,59 @@ app.controller('UserController', function($scope, $http, $auth, $location){
         else mn = parseInt(mn);
         var qry_date = yr+"-"+mn;
 
-        //home screen theory
-        $http.get(protocol+"//"+host+"/api/get-home-theory?date="+qry_date+"&user="+$scope.loggedUser._id+"&token="+$auth.getToken()).then(function(response){
-          $scope.theory_home = response.data;
-          for(var i=0; i<$scope.theory_home.length; i++){
-            $scope.theory_attended_home += $scope.theory_home[i].attended;
-            $scope.theory_total_home += $scope.theory_home[i].total;
-          }
-          $scope.theory_avg = Math.round(($scope.theory_attended_home/$scope.theory_total_home)*100);
-        });
-
-        //home screen lab
-        $http.get(protocol+"//"+host+"/api/get-home-lab?date="+qry_date+"&user="+$scope.loggedUser._id+"&token="+$auth.getToken()).then(function(response){
-          $scope.lab_home = response.data;
-          for(var i=0; i<$scope.lab_home.length; i++){
-            // alert($scope.lab_home[i].attended);
-            $scope.lab_attended_home += $scope.lab_home[i].attended;
-            $scope.lab_total_home += $scope.lab_home[i].total;
-          }
-          $scope.lab_avg = Math.round(($scope.lab_attended_home/$scope.lab_total_home)*100);
-        });
+        var att = [];
+        att = $scope.getAtt(qry_date);
+        $scope.attendance_home = att;
+        // $scope.lab_home = att[1];
+        // for(var i=0; i<att[0].length; i++){
+        //   $scope.theory_attended_home += att[0][i].attended;
+        //   $scope.theory_total_home += att[0][i].total;
+        // }
+        // $scope.theory_avg = Math.round(($scope.theory_attended_home/$scope.theory_total_home)*100);
       });
+
+    };
+
+    $scope.getSubTheory = function(){
+      $http.get(protocol+"//"+host+"/api/get-subject-theory?course="+$scope.loggedUser.course+"&sem="+$scope.loggedUser.sem+"&token="+$auth.getToken()).then(function(response){
+        $scope.subject_theory = response.data;
+        for(var i = 0; i < $scope.subject_theory.length; i++){
+          $scope.attendance_theory.push({
+            "stud_id" : $scope.loggedUser._id,
+            "sub_id" : $scope.subject_theory[i]._id,
+            "date"  : $scope.user.date,
+            "status" : false,
+            "unscheduled" : false
+          });
+        }
+      });
+    };
+
+    $scope.getSubLab = function(){
+      $http.get(protocol+"//"+host+"/api/get-subject-lab?course="+$scope.loggedUser.course+"&sem="+$scope.loggedUser.sem+"&token="+$auth.getToken()).then(function(response){
+        $scope.subject_lab = response.data;
+        for(var i = 0; i < $scope.subject_lab.length; i++){
+          $scope.attendance_lab.push({
+            "stud_id" : $scope.loggedUser._id,
+            "sub_id" : $scope.subject_lab[i]._id,
+            "date"  : $scope.user.date,
+            "status" : 0,
+            "unscheduled" : 0
+          });
+        }
+      });
+    };
+
+    $scope.getAtt = function(date){
+      var att = [];
+      $scope.theory = $http.get(protocol+"//"+host+"/api/get-home-theory?date="+date+"&user="+$scope.loggedUser._id+"&token="+$auth.getToken());
+      $scope.lab = $http.get(protocol+"//"+host+"/api/get-home-lab?date="+date+"&user="+$scope.loggedUser._id+"&token="+$auth.getToken());
+      $q.all([$scope.theory,$scope.lab]).then(function(response){
+        for(var i =0; i<response.length; i++)
+          att.push(response[i].data);
+        console.log(att);
+      });
+      return att;
     };
 
     $scope.addUser = function(){
@@ -198,6 +199,14 @@ app.controller('UserController', function($scope, $http, $auth, $location){
       }else{
         return "Whoops! Your on the border lad."
       }
+    };
+
+    $scope.attendance_monthly = [];
+    $scope.attendanceMonthly = function(month){
+      var year = new Date().getFullYear();
+      var date = year+"-"+month;
+      $scope.attendance_monthly = $scope.getAtt(date);
+      console.log($scope.attendance_monthly);
     };
 
 });

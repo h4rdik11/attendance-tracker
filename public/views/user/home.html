@@ -57,7 +57,6 @@
 
 </div>
 
-
 <div class="dash-view main-view" ng-show="showMain">
   <div class="dash-head">
     <center><h5>Attendance For : <strong>{{month}}</strong></h5></center>
@@ -75,7 +74,7 @@
             <td><center><b>Total</b></center></td>
           </thead>
           <tbody>
-            <tr ng-repeat="t in theory_home">
+            <tr ng-repeat="t in attendance_home[0]">
               <td>{{$index+1}}</td>
               <td>{{t.details[0].abv[0]}}</td>
               <td><center>{{t.attended}}</center></td>
@@ -95,7 +94,7 @@
             <td><center><b>Total</b></center></td>
           </thead>
           <tbody>
-            <tr ng-repeat="l in lab_home">
+            <tr ng-repeat="l in attendance_home[1]">
               <td>{{$index+1}}</td>
               <td>{{l.details[0].abv[0]}}</td>
               <td><center>{{l.attended}}</center></td>
@@ -285,22 +284,22 @@
               <ul class="dropdown-menu dropdown-menu-right month-dropdown">
                 <div class="row">
                   <div class="col-xs-4">
-                    <li><a href="#">January</a></li>
-                    <li><a href="#">February</a></li>
-                    <li><a href="#">March</a></li>
-                    <li><a href="#">April</a></li>
+                    <li><a href="#" ng-click=attendanceMonthly("01")>January</a></li>
+                    <li><a href="#" ng-click=attendanceMonthly("02")>February</a></li>
+                    <li><a href="#" ng-click=attendanceMonthly("03")>March</a></li>
+                    <li><a href="#" ng-click=attendanceMonthly("04")>April</a></li>
                   </div>
                   <div class="col-xs-4">
-                    <li><a href="#">May</a></li>
-                    <li><a href="#">June</a></li>
-                    <li><a href="#">July</a></li>
-                    <li><a href="#">August</a></li>
+                    <li><a href="#" ng-click=attendanceMonthly("05")>May</a></li>
+                    <li><a href="#" ng-click=attendanceMonthly("06")>June</a></li>
+                    <li><a href="#" ng-click=attendanceMonthly("07")>July</a></li>
+                    <li><a href="#" ng-click=attendanceMonthly("08")>August</a></li>
                   </div>
                   <div class="col-xs-4">
-                    <li><a href="#">September</a></li>
-                    <li><a href="#">October</a></li>
-                    <li><a href="#">November</a></li>
-                    <li><a href="#">December</a></li>
+                    <li><a href="#" ng-click=attendanceMonthly("09")>September</a></li>
+                    <li><a href="#" ng-click=attendanceMonthly("10")>October</a></li>
+                    <li><a href="#" ng-click=attendanceMonthly("11")>November</a></li>
+                    <li><a href="#" ng-click=attendanceMonthly("12")>December</a></li>
                   </div>
                 </div>
               </ul>
@@ -319,33 +318,15 @@
         <thead>
           <td><b>#</b></td>
           <td><b>Student Name</b></td>
-          <td><b>Attended</b></td>
-          <td><b>Total</b></td>
+          <td><center><b>Attended</b></center></td>
+          <td><center><b>Total</b></center></td>
         </thead>
         <tbody>
-          <tr>
-            <td>1</td>
-            <td>DAA</td>
-            <td>5</td>
-            <td>5</td>
-          </tr>
-          <tr>
-            <td>1</td>
-            <td>DAA</td>
-            <td>5</td>
-            <td>5</td>
-          </tr>
-          <tr>
-            <td>1</td>
-            <td>DAA</td>
-            <td>5</td>
-            <td>5</td>
-          </tr>
-          <tr>
-            <td>1</td>
-            <td>DAA</td>
-            <td>5</td>
-            <td>5</td>
+          <tr ng-repeat="th in attendance_monthly[0]">
+            <td>{{$index+1}}</td>
+            <td>{{th.details[0].abv[0]}}</td>
+            <td><center>{{th.attended}}</center></td>
+            <td><center>{{th.total}}</center></td>
           </tr>
         </tbody>
       </table>
@@ -357,33 +338,15 @@
         <thead>
           <td><b>#</b></td>
           <td><b>Student Name</b></td>
-          <td><b>Attended</b></td>
-          <td><b>Total</b></td>
+          <td><center><b>Attended</b></center></td>
+          <td><center><b>Total</b></center></td>
         </thead>
         <tbody>
-          <tr>
-            <td>1</td>
-            <td>DAA</td>
-            <td>5</td>
-            <td>5</td>
-          </tr>
-          <tr>
-            <td>1</td>
-            <td>DAA</td>
-            <td>5</td>
-            <td>5</td>
-          </tr>
-          <tr>
-            <td>1</td>
-            <td>DAA</td>
-            <td>5</td>
-            <td>5</td>
-          </tr>
-          <tr>
-            <td>1</td>
-            <td>DAA</td>
-            <td>5</td>
-            <td>5</td>
+          <tr ng-repeat="th in attendance_monthly[1]">
+            <td>{{$index+1}}</td>
+            <td>{{th.details[0].abv[0]}}</td>
+            <td><center>{{th.attended}}</center></td>
+            <td><center>{{th.total}}</center></td>
           </tr>
         </tbody>
       </table>
