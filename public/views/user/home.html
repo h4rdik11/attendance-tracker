@@ -71,15 +71,15 @@
           <thead>
             <td><b>#</b></td>
             <td><b>Subject Name</b></td>
-            <td><b>Attended</b></td>
-            <td><b>Total</b></td>
+            <td><center><b>Attended</b></center></td>
+            <td><center><b>Total</b></center></td>
           </thead>
           <tbody>
-            <tr>
-              <td>{{$index}}</td>
-              <td>{{t.details.abv}}</td>
-              <td>{{t.attended}}</td>
-              <td>{{t.total}}</td>
+            <tr ng-repeat="t in theory_home">
+              <td>{{$index+1}}</td>
+              <td>{{t.details[0].abv[0]}}</td>
+              <td><center>{{t.attended}}</center></td>
+              <td><center>{{t.total}}</center></td>
             </tr>
           </tbody>
         </table>
@@ -91,33 +91,15 @@
           <thead>
             <td><b>#</b></td>
             <td><b>Subject Name</b></td>
-            <td><b>Attended</b></td>
-            <td><b>Total</b></td>
+            <td><b><center>Attended</b></center></td>
+            <td><center><b>Total</b></center></td>
           </thead>
           <tbody>
-            <tr>
-              <td>1</td>
-              <td>DAA</td>
-              <td>5</td>
-              <td>5</td>
-            </tr>
-            <tr>
-              <td>1</td>
-              <td>DAA</td>
-              <td>5</td>
-              <td>5</td>
-            </tr>
-            <tr>
-              <td>1</td>
-              <td>DAA</td>
-              <td>5</td>
-              <td>5</td>
-            </tr>
-            <tr>
-              <td>1</td>
-              <td>DAA</td>
-              <td>5</td>
-              <td>5</td>
+            <tr ng-repeat="l in lab_home">
+              <td>{{$index+1}}</td>
+              <td>{{l.details[0].abv[0]}}</td>
+              <td><center>{{l.attended}}</center></td>
+              <td><center>{{l.total}}</center></td>
             </tr>
           </tbody>
         </table>
@@ -137,10 +119,10 @@
                   <span>Theory</span>
                 </div>
                 <round-progress
-                max="6"
-                current="5"
-                color="green"
-                bgcolor="#eaeaea"
+                max=theory_total_home
+                current=theory_attended_home
+                color="{{ getColor(theory_attended_home, theory_total_home) }}"
+                bgolor="#eaeaea"
                 radius="45"
                 stroke="5"
                 rounded="true"
@@ -154,7 +136,7 @@
             </center>
           </div>
           <div class="col-md-12 percent-text">
-            <center><h3>75%</h3><small>You can bunk 0 classes.</small></center>
+            <center><h3>{{theory_avg}}%</h3><small>{{getBunk(theory_attended_home, theory_total_home)}}</small></center>
           </div>
         </div>
       </div>
@@ -167,9 +149,9 @@
                   <span>Lab</span>
                 </div>
                 <round-progress
-                max="6"
-                current="5"
-                color="green"
+                max=lab_total_home
+                current=lab_attended_home
+                color="{{ getColor(lab_attended_home, lab_total_home) }}"
                 bgcolor="#eaeaea"
                 radius="45"
                 stroke="5"
@@ -184,7 +166,7 @@
             </center>
           </div>
           <div class="col-md-12 percent-text">
-            <center><h3>75%</h3><small>You can bunk 0 classes.</small></center>
+            <center><h3>{{lab_avg}}%</h3><small>{{getBunk(lab_attended_home, lab_total_home)}}</small></center>
           </div>
         </div>
       </div>

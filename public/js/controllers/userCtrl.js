@@ -2,6 +2,7 @@ app.controller('UserController', function($scope, $http, $auth, $location){
 
     var host = location.host;
     var protocol = location.protocol;
+    $scope.Math = window.Math;
 
     if(! $auth.isAuthenticated()) window.location.href = protocol+"//"+host;
 
@@ -55,16 +56,38 @@ app.controller('UserController', function($scope, $http, $auth, $location){
         //getting attendance for home screen
         $scope.theory_home = [];
         $scope.lab_home = [];
+        $scope.theory_attended_home = 0;
+        $scope.theory_total_home = 0;
+        $scope.theory_avg = 0;
+        $scope.lab_attended_home = 0;
+        $scope.lab_total_home = 0;
+        $scope.lab_avg = 0;
         var d = new Date();
         var yr = d.getFullYear();
         var mn = d.getMonth();
         if(parseInt(mn)+1 < 10) mn = 0+""+parseInt(parseInt(mn)+1);
         else mn = parseInt(mn);
         var qry_date = yr+"-"+mn;
-        //alert(qry_date);
-        $http.get(protocol+"//"+host+"/api/get-home-theory?date="+qry_date+"&user="+$scope.loggedUser._id+"&token="+$auth.getToken(), function(response){
-            $scope.theory_home = response.data;
-            alert($scope.theory_home);
+
+        //home screen theory
+        $http.get(protocol+"//"+host+"/api/get-home-theory?date="+qry_date+"&user="+$scope.loggedUser._id+"&token="+$auth.getToken()).then(function(response){
+          $scope.theory_home = response.data;
+          for(var i=0; i<$scope.theory_home.length; i++){
+            $scope.theory_attended_home += $scope.theory_home[i].attended;
+            $scope.theory_total_home += $scope.theory_home[i].total;
+          }
+          $scope.theory_avg = Math.round(($scope.theory_attended_home/$scope.theory_total_home)*100);
+        });
+
+        //home screen lab
+        $http.get(protocol+"//"+host+"/api/get-home-lab?date="+qry_date+"&user="+$scope.loggedUser._id+"&token="+$auth.getToken()).then(function(response){
+          $scope.lab_home = response.data;
+          for(var i=0; i<$scope.lab_home.length; i++){
+            // alert($scope.lab_home[i].attended);
+            $scope.lab_attended_home += $scope.lab_home[i].attended;
+            $scope.lab_total_home += $scope.lab_home[i].total;
+          }
+          $scope.lab_avg = Math.round(($scope.lab_attended_home/$scope.lab_total_home)*100);
         });
       });
     };
@@ -124,9 +147,9 @@ app.controller('UserController', function($scope, $http, $auth, $location){
     $scope.showMonthly = false;
     $scope.showOverall = false;
     $scope.changeView = function(val){
-      if(val === "classmate"){
-        $scope.showMain = false;
-        $scope.showClassmates = true;
+      if(val === "home"){
+        $scope.showMain = true;
+        $scope.showClassmates = false;
         $scope.showDaily = false;
         $scope.showMonthly = false;
         $scope.showOverall = false;
@@ -150,5 +173,31 @@ app.controller('UserController', function($scope, $http, $auth, $location){
         $scope.showOverall = true;
       }
     }
+
+    $scope.getColor = function(attended, total){
+      var per = (attended/total)*100;
+      if(per > 75){
+        return "#4A81CB";
+      }
+      else if(per == 75){
+        return "#DF9308";
+      }
+      else{
+        return "#CC3508";
+      }
+    };
+
+    $scope.getBunk = function(attended, total){
+      if(Math.round((attended/total)*100) > 75){
+        var p = Match.round((attended/75)*100);
+        var b = p-total;
+        return "You can bunk "+b+" classes.";
+      }else if(Math.round((attended/total)*100) < 75){
+        var b = Math.round((total*3)-(attended*4));
+        return "You have to attend "+b+" classes.";
+      }else{
+        return "Whoops! Your on the border lad."
+      }
+    };
 
 });

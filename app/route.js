@@ -192,6 +192,51 @@ module.exports = function(app){
         });
     });
 
+    app.get("/api/get-home-lab", function(req, res){
+      Attendance.aggregate([
+        {
+          $lookup:{
+            from:"subjects",
+            localField:"sub_id",
+            foreignField:"_id",
+            as:"subjects"
+          }
+        },
+        {
+          $project:{
+            "sub_id":1,
+            "stud_id":1,
+            "status":1,
+            "unscheduled":1,
+            "date":1,
+            "abv":"$subjects.abv",
+            "name":"$subjects.name"
+          }
+        },
+        {
+          $match:{
+            $and:[
+              {"stud_id": new ObjectId(req.query.user)},
+              {"date":{$regex:"^"+req.query.date}},
+              {"unscheduled":false},
+              {"abv":{$regex:"LAB"}}
+            ]
+          }
+        },
+        {
+          $group:{
+            _id:"$sub_id",
+            details:{$push:"$$ROOT"},
+            attended:{$sum:{$cond:{if:{$eq:["$status",true]}, then:1, else:0}}},
+            total:{$sum:1}
+          }
+        }
+      ], function(err, result){
+        if(result) res.json(result);
+        else res.send(err);
+      });
+    });
+
 
   /* Frontend Routes */
   app.get('/user', function(req,res){
