@@ -1,6 +1,6 @@
 <style media="screen">
 
-  .main-tabs{ padding: 5% 0 5% 0; border-bottom: 1px solid #E0E0E0; }
+  .main-tabs{ padding: 5% 0 5% 0; border-bottom: 1px solid #E0E0E0;}
   .btn .card-block{ width: 100%; }
   .card-block{ color: #fff; padding: 0% 4% 0% 4%; width: 100%; margin-bottom: 3%}
   .card-block #card-icon { font-size: 20px;}
@@ -10,8 +10,8 @@
   #divider{ border-top: 1px solid #E0E0E0; margin-top: 2%}
 
   .dash-view{ margin-top: 10%}
-  .dash-view .dash-head h5{ margin-bottom: 0%; border-bottom: 1px solid #E0E0E0; padding-bottom: 1%}
-  .dash-view .dash-body .row{ margin-top: 2%}
+  .main-view .dash-head h5{ margin-bottom: 0%; border-bottom: 1px solid #E0E0E0; padding-bottom: 1%}
+  .main-view .dash-body .row{ margin-top: 2%}
 
   .percent-block{ margin-top: 10% !important; }
   .percent-block .percent-text h3{ margin-bottom: 2% }
@@ -28,16 +28,7 @@
 
 <div class="row main-tabs">
 
-  <div class="col-xs-3">
-    <div class="btn card-block mdl-shadow--4dp mdl-color--red-500" ng-click="changeView('classmate')">
-      <div class="head">
-        <center><span id="card-icon"><i class="fa fa-users" aria-hidden="true"></i></span></center>
-        <span id="card-text">Classmates(20)</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-xs-3">
+  <div class="col-xs-4">
     <div class="btn card-block mdl-shadow--4dp mdl-color--cyan-500" ng-click="changeView('daily')">
       <div class="head">
         <center><span id="card-icon"><i class="fa fa-calendar-times-o" aria-hidden="true"></i></span></center>
@@ -46,7 +37,7 @@
     </div>
   </div>
 
-  <div class="col-xs-3">
+  <div class="col-xs-4">
     <div class="btn card-block mdl-shadow--4dp mdl-color--blue-500" ng-click="changeView('monthly')">
       <div class="head">
         <center><span id="card-icon"><i class="fa fa-calendar" aria-hidden="true"></i></span></center>
@@ -55,7 +46,7 @@
     </div>
   </div>
 
-  <div class="col-xs-3">
+  <div class="col-xs-4">
     <div class="btn card-block mdl-shadow--4dp mdl-color--teal-500" ng-click="changeView('overall')">
       <div class="head">
         <center><span id="card-icon"><i class="fa fa-area-chart" aria-hidden="true"></i></span></center>
@@ -69,7 +60,7 @@
 
 <div class="dash-view main-view" ng-show="showMain">
   <div class="dash-head">
-    <center><h5>Attendance For : <strong>April</strong></h5></center>
+    <center><h5>Attendance For : <strong>{{month}}</strong></h5></center>
   </div>
   <div class="dash-body">
     <div class="row">
@@ -85,28 +76,10 @@
           </thead>
           <tbody>
             <tr>
-              <td>1</td>
-              <td>DAA</td>
-              <td>5</td>
-              <td>5</td>
-            </tr>
-            <tr>
-              <td>1</td>
-              <td>DAA</td>
-              <td>5</td>
-              <td>5</td>
-            </tr>
-            <tr>
-              <td>1</td>
-              <td>DAA</td>
-              <td>5</td>
-              <td>5</td>
-            </tr>
-            <tr>
-              <td>1</td>
-              <td>DAA</td>
-              <td>5</td>
-              <td>5</td>
+              <td>{{$index}}</td>
+              <td>{{t.details.abv}}</td>
+              <td>{{t.attended}}</td>
+              <td>{{t.total}}</td>
             </tr>
           </tbody>
         </table>
@@ -219,69 +192,24 @@
   </div>
 </div>
 
-<div class="dash-view classmate-view" ng-show="showClassmates">
-
-  <table class="table table-hover">
-    <thead>
-      <td><strong>#</strong></td>
-      <td><strong>Name</strong></td>
-      <td><strong>Attended</strong></td>
-      <td><strong>Total</strong></td>
-      <td><strong>%</strong></td>
-    </thead>
-    <tbody>
-      <tr>
-        <td>1</td>
-        <td>Hardik Chuahan</td>
-        <td>5</td>
-        <td>5</td>
-        <td>100</td>
-      </tr>
-      <tr>
-        <td>1</td>
-        <td>Hardik Chuahan</td>
-        <td>5</td>
-        <td>5</td>
-        <td>100</td>
-      </tr>
-      <tr>
-        <td>1</td>
-        <td>Hardik Chuahan</td>
-        <td>5</td>
-        <td>5</td>
-        <td>100</td>
-      </tr>
-      <tr>
-        <td>1</td>
-        <td>Hardik Chuahan</td>
-        <td>5</td>
-        <td>5</td>
-        <td>100</td>
-      </tr>
-      <tr>
-        <td>1</td>
-        <td>Hardik Chuahan</td>
-        <td>5</td>
-        <td>5</td>
-        <td>100</td>
-      </tr>
-    </tbody>
-  </table>
-
-</div>
-
 <div class="dash-view daily-view" ng-show="showDaily">
   <div class="row">
     <div class="col-md-4"></div>
     <div class="col-md-4">
-      <div class="form-group">
-        <center><label>Select Date</label></center>
-        <input type="text" class="form-control datepicker" readonly>
-      </div>
+        <center>
+          <div class="input-group">
+            <div class="input-group-btn">
+              <button type="button" class="btn btn-default">Select Date</button>
+            </div><!-- /btn-group -->
+            <input type="text" class="form-control datepicker" style="text-align:center" readonly>
+          </div><!-- /input-group -->
+        </center>
     </div>
     <div class="col-md-4"></div>
   </div>
+
   <div id="divider"></div>
+
   <div class="row">
 
     <div class="col-md-6">
@@ -289,7 +217,7 @@
         <caption><strong>Theory Attendance</strong></caption>
         <thead>
           <td><b>#</b></td>
-          <td><b>Subject Name</b></td>
+          <td><b>Student Name</b></td>
           <td><b>Attended</b></td>
           <td><b>Total</b></td>
         </thead>
@@ -327,7 +255,7 @@
         <caption><strong>Lab Attendance</strong></caption>
         <thead>
           <td><b>#</b></td>
-          <td><b>Subject Name</b></td>
+          <td><b>Student Name</b></td>
           <td><b>Attended</b></td>
           <td><b>Total</b></td>
         </thead>
@@ -400,6 +328,87 @@
     </div>
     <div class="col-md-4"></div>
   </div>
+
+  <div class="row">
+
+    <div class="col-md-6">
+      <table class="table table-hover">
+        <caption><strong>Theory Attendance</strong></caption>
+        <thead>
+          <td><b>#</b></td>
+          <td><b>Student Name</b></td>
+          <td><b>Attended</b></td>
+          <td><b>Total</b></td>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>DAA</td>
+            <td>5</td>
+            <td>5</td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>DAA</td>
+            <td>5</td>
+            <td>5</td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>DAA</td>
+            <td>5</td>
+            <td>5</td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>DAA</td>
+            <td>5</td>
+            <td>5</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col-md-6">
+      <table class="table table-hover">
+        <caption><strong>Lab Attendance</strong></caption>
+        <thead>
+          <td><b>#</b></td>
+          <td><b>Student Name</b></td>
+          <td><b>Attended</b></td>
+          <td><b>Total</b></td>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>DAA</td>
+            <td>5</td>
+            <td>5</td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>DAA</td>
+            <td>5</td>
+            <td>5</td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>DAA</td>
+            <td>5</td>
+            <td>5</td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>DAA</td>
+            <td>5</td>
+            <td>5</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
 </div>
 
 <div class="dash-view overall-view" ng-show="showOverall">

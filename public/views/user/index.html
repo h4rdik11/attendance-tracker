@@ -52,7 +52,7 @@
     </style>
 
   </head>
-  <body ng-app="attendanceApp" ng-controller="UserController">
+  <body ng-app="attendanceApp" ng-controller="UserController" ng-init="initFun()">
     <!-- The drawer is always open in large screens. The header is always shown, even in small screens. -->
     <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
     <header class="mdl-layout__header">
@@ -72,11 +72,10 @@
       <nav class="mdl-navigation">
         <a class="mdl-navigation__link" ui-sref="/">Dashboard</a>
         <a class="mdl-navigation__link" ui-sref="/mark-attendance">Mark Attendance</a>
-        <a class="mdl-navigation__link" href="">Edit Attendance</a>
         <a class="mdl-navigation__link" href="" ng-click="logout()">Logout</a>
       </nav>
     </div>
-    <main class="mdl-layout__content container mdl-shadow--4dp">
+    <main class="mdl-layout__content container">
       <div class="page-content">
         <div ui-view></div>
       </div>

@@ -1,7 +1,11 @@
 var User = require("./models/user");
+var Attendance = require("./models/attendance");
+var Subject = require("./models/subject");
 var jwt = require("jwt-simple");
 var moment = require("moment");
 var config = require("../config/db");
+var mongoose = require("mongoose");
+var ObjectId = mongoose.Types.ObjectId;
 
 module.exports = function(app){
 
@@ -70,6 +74,124 @@ module.exports = function(app){
       }
     });
   });
+
+  //adding subjects
+  app.post('/api/add-subject', function(req, res){
+    var s = new Subject(req.body);
+    s.save(function(err, result){
+      if(err) res.send("Error");
+      else res.send("Subject added");
+    });
+  });
+
+  //getting subjects(theory)
+  app.get('/api/get-subject-theory', function(req, res){
+    Subject.find({"course" : req.query.course, "sem" : req.query.sem, "abv" : {$not:/LAB.*/}}, function(err, result){
+      if(err){
+        res.send("No subject found");
+      }else{
+        res.json(result);
+      }
+    });
+  });
+  //getting sunjects (Lab)
+  app.get('/api/get-subject-lab',function(req, res){
+    Subject.find({"course" : req.query.course, "sem" : req.query.sem, "abv": {$regex:"LAB"}}, function(err, result){
+      if(err) res.send("No subject found");
+      else res.json(result);
+    });
+  });
+
+  //marking attendance
+  app.get('/api/check-attendance', function(req, res){
+    var date = req.query.date.split("/");
+    var dt = date[2]+"-"+date[1]+"-"+date[0];
+    var user = req.query.user;
+    //Attendance.aggregate([{$lookup:{from:"users",localField:"stud_id",foreignField:"_id",as:"user"}}]).forEach(printjson)
+    Attendance.find({$and:[{"stud_id":user},{"date":dt}]}, function(err, exists){
+      if(exists.length > 0) res.send("exists");
+      else res.send("you can enter");
+    });
+  });
+  app.post('/api/mark-attendance', function(req, res){
+    var success = false;
+    for(var i =0; i< req.body.length; i++){
+      var success = false;
+      var dt = req.body[i].date.split("/");
+      var date = dt[2]+"-"+dt[1]+"-"+dt[0];
+      req.body[i].date = date;
+      var a = new Attendance(req.body[i]);
+      a.save(function(err, pass){
+        if(err) success = false;
+        else success = true;
+      });
+    }
+    if(success == false) res.send("error");
+    else res.send("success");
+  });
+
+  // app.get('/api/get-date', function(req, res){
+  //   var dtArr = req.query.date.split("/");
+  //   var temp = parseInt(dtArr[0])+1;
+  //   dtArr[0] = dtArr[2];
+  //   dtArr[2] = temp;
+  //   dtArr.join();
+  //   var dt = new Date(dtArr);
+  //   console.log(dt);
+  // });
+
+  //getting attendance
+
+    /* Getting attendance for home screen */
+    app.get('/api/get-home-theory', function(req, res){
+        var user = req.query.user;
+        Attendance.aggregate([
+          {
+            $lookup:{
+              from:"subjects",
+              localField:"sub_id",
+              foreignField:"_id",
+              as:"subjects"
+            }
+          },
+          {
+            $project:{
+              "stud_id":1,
+              "sub_id":1,
+              "status":1,
+              "unscheduled":1,
+              "date":1,
+              "abv":"$subjects.abv",
+              "name":"$subjects.name"
+            }
+          },
+          {
+            $match:{
+              $and:[
+                {"stud_id":new ObjectId(req.query.user)},
+                {"unscheduled":false},
+                {"abv":{$not:/LAB.*/}},
+                {"date":{$regex:"^"+req.query.date}}
+              ]
+            }
+          },
+          {
+            $group:{
+              _id: "$sub_id",
+              details:{$push:"$$ROOT"},
+              attended:{$sum:{$cond:{if:{$eq:["$status",true]}, then:1, else:0}}},
+              total: {$sum:1}
+            }
+          }
+        ], function(err, result){
+          if(result){
+            res.json(result);
+          }else{
+            res.send(err);
+          }
+        });
+    });
+
 
   /* Frontend Routes */
   app.get('/user', function(req,res){
