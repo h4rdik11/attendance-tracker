@@ -35,6 +35,7 @@
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script type="text/javascript" src="libs/angular/angular.min.js"></script>
+    <script type="text/javascript" src="libs/angular-sanitize/angular-sanitize.min.js"></script>
     <script src="libs/ui-router.min.js"></script>
 
     <!-- Angular Customs -->
@@ -58,7 +59,7 @@
   <body ng-app="attendanceApp" ng-controller="UserController" ng-init="initFun()">
     <!-- The drawer is always open in large screens. The header is always shown, even in small screens. -->
     <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
-    <header class="mdl-layout__header">
+    <header class="mdl-layout__header mdl-color--blue-grey-900">
       <div class="mdl-layout__header-row">
         <!-- Title -->
         <span class="mdl-layout-title">{{loggedUser.name}}</span>
@@ -69,7 +70,20 @@
           <a class="mdl-navigation__link" href="">User</a>
         </nav>
         <nav class="mdl-navigation mdl-layout--small-screen-only">
-          <a ui-sref="/" ng-click=changeView("home") class="mdl-navigation__link small-screen-home"><i class="fa fa-home" aria-hidden="true"></i></a>
+          <a ui-sref="/" ng-click=changeView("home") class="mdl-navigation__link small-screen-home"><i class="fa fa-home" aria-hidden="true" style="color:#00BCD4"></i></a>
+          <!-- Right aligned menu below button -->
+          <button id="demo-menu-lower-right"
+                  class="mdl-button mdl-js-button mdl-button--icon">
+            <i class="material-icons">more_vert</i>
+          </button>
+
+          <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect"
+              for="demo-menu-lower-right">
+            <li class="mdl-menu__item">Some Action</li>
+            <li class="mdl-menu__item">Another Action</li>
+            <li disabled class="mdl-menu__item">Disabled Action</li>
+            <li class="mdl-menu__item">Yet Another Action</li>
+          </ul>
         </nav>
       </div>
     </header>
@@ -81,9 +95,13 @@
         <a class="mdl-navigation__link" href="" ng-click="logout()">Logout</a>
       </nav>
     </div>
-    <main class="mdl-layout__content container">
+    <main class="mdl-layout__content container  mdl-color--blue-grey-700">
       <div class="page-content">
         <div ui-view></div>
+        <div id="demo-toast-example" class="mdl-js-snackbar mdl-snackbar">
+          <div class="mdl-snackbar__text"></div>
+          <button class="mdl-snackbar__action" type="button"></button>
+        </div>
       </div>
     </main>
   </div>

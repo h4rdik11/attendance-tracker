@@ -94,7 +94,7 @@ module.exports = function(app){
       }
     });
   });
-  //getting sunjects (Lab)
+  //getting subjects (Lab)
   app.get('/api/get-subject-lab',function(req, res){
     Subject.find({"course" : req.query.course, "sem" : req.query.sem, "abv": {$regex:"LAB"}}, function(err, result){
       if(err) res.send("No subject found");
@@ -122,26 +122,32 @@ module.exports = function(app){
       req.body[i].date = date;
       var a = new Attendance(req.body[i]);
       a.save(function(err, pass){
-        if(err) success = false;
-        else success = true;
+        if(err) res.send("Error : Contact hardik11.chauhan@gmail.com");
       });
     }
-    if(success == false) res.send("error");
-    else res.send("success");
+    res.send("Attendance marked successfully.");
   });
 
-  // app.get('/api/get-date', function(req, res){
-  //   var dtArr = req.query.date.split("/");
-  //   var temp = parseInt(dtArr[0])+1;
-  //   dtArr[0] = dtArr[2];
-  //   dtArr[2] = temp;
-  //   dtArr.join();
-  //   var dt = new Date(dtArr);
-  //   console.log(dt);
-  // });
+  //update attendance
+  app.post("/api/update-attendance", function(req, res){
+    var success = true;
+    for(var i = 0; i<req.body.data.length; i++){
+      Attendance.update(
+        {"_id":new ObjectId(req.body.data[i]._id)},
+        {
+          $set:{
+            "status":req.body.data[i].status,
+            "unscheduled":req.body.data[i].unscheduled
+          }
+        },
+        function(err, result){
+          if(err) res.send("Error : Contact hardik11.chauhan@gmail.com");;
+        });
+    }
+    res.send("Attendance updated successfully.");
+  });
 
   //getting attendance
-
     /* Getting attendance for home screen */
     app.get('/api/get-home-theory', function(req, res){
         var user = req.query.user;
@@ -237,6 +243,155 @@ module.exports = function(app){
       });
     });
 
+    /* Getting Daily Attendance for theory */
+    app.get("/api/get-daily-theory", function(req, res){
+      Attendance.aggregate([
+        {
+          $lookup:{
+            from:"subjects",
+            localField:"sub_id",
+            foreignField:"_id",
+            as:"subjects"
+          }
+        },
+        {
+          $project:{
+            "stud_id":1,
+            "sub_id":1,
+            "status":1,
+            "unscheduled":1,
+            "date":1,
+            "abv":"$subjects.abv",
+            "sub_name":"$subjects.name"
+          }
+        },
+        {
+          $match:{
+            $and:[
+              {"stud_id":new ObjectId(req.query.user)},
+              {"date":req.query.date},
+              {"abv":{$not:/LAB.*/}}
+            ]
+          }
+        }
+      ], function(err, result){
+        if(err) res.send(err);
+        else res.json(result);
+      });
+    });
+
+    /* Getting daily attendance for lab */
+    app.get("/api/get-daily-lab", function(req, res){
+      Attendance.aggregate([
+        {
+          $lookup:{
+            from:"subjects",
+            localField:"sub_id",
+            foreignField:"_id",
+            as:"subjects"
+          }
+        },
+        {
+          $project:{
+            "sub_id":1,
+            "stud_id":1,
+            "status":1,
+            "date":1,
+            "unscheduled":1,
+            "abv":"$subjects.abv",
+            "sub_name":"$subjects.name"
+          }
+        },
+        {
+          $match:{
+            $and:[
+              {"stud_id": new ObjectId(req.query.user)},
+              {"date":req.query.date},
+              {"abv":{$regex:"LAB"}}
+            ]
+          }
+        }
+      ], function(err, result){
+        if(err) res.send(err);
+        else res.json(result);
+      });
+    });
+
+    /* Getting Theory attendance to edit */
+    app.get("/api/get-edit-theory", function(req, res){
+      Attendance.aggregate([
+        {
+          $lookup:{
+            from:"subjects",
+            localField:"sub_id",
+            foreignField:"_id",
+            as:"subjects"
+          }
+        },
+        {
+          $project:{
+            "_id":1,
+            "stud_id":1,
+            "sub_id":1,
+            "status":1,
+            "unscheduled":1,
+            "date":1,
+            "abv":"$subjects.abv",
+            "name":"$subjects.name"
+          }
+        },
+        {
+          $match:{
+            $and:[
+              {"stud_id" : new ObjectId(req.query.user)},
+              {"date" : req.query.date},
+              {"abv" : {$not:/LAB.*/}}
+            ]
+          }
+        }
+      ], function(err, result){
+        if(err) res.send("Error: please report the matter at hardik11.chauhan@gmail.com");
+        else res.json(result);
+      });
+    });
+
+    /* Getting lab attendance to edit */
+    app.get("/api/get-edit-lab", function(req, res){
+      Attendance.aggregate([
+        {
+          $lookup:{
+            from:"subjects",
+            localField:"sub_id",
+            foreignField:"_id",
+            as:"subjects"
+          }
+        },
+        {
+          $project:{
+            "_id":1,
+            "stud_id":1,
+            "sub_id":1,
+            "status":1,
+            "unscheduled":1,
+            "date":1,
+            "abv":"$subjects.abv",
+            "name":"$subjects.name"
+          }
+        },
+        {
+          $match:{
+            $and:[
+              {"stud_id" : new ObjectId(req.query.user)},
+              {"date" : req.query.date},
+              {"abv" : {$regex:"LAB"}}
+            ]
+          }
+        }
+      ],function(err, result){
+        if(err) res.send("Error: please report the matter at hardik11.chauhan@gmail.com");
+        else res.json(result);
+      });
+    });
 
   /* Frontend Routes */
   app.get('/user', function(req,res){

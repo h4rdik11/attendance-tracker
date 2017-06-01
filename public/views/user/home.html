@@ -1,28 +1,33 @@
 <style media="screen">
 
-  .main-tabs{ padding: 5% 0 5% 0; border-bottom: 1px solid #E0E0E0;}
+  .main-tabs{ padding: 5% 0 5% 0; border-bottom: 1px solid #546E7A;}
   .btn .card-block{ width: 100%; }
   .card-block{ color: #fff; padding: 0% 4% 0% 4%; width: 100%; margin-bottom: 3%}
   .card-block #card-icon { font-size: 20px;}
   .card-block #card-text{ font-size: 9px; font-weight: bold;}
   .card-block .head{ padding: 10% }
   .col-xs-3{ padding: 0 1% 0 2%;}
-  #divider{ border-top: 1px solid #E0E0E0; margin-top: 2%}
+  #divider{ border-top: 1px solid #9e9e9e; margin-top: 2%}
 
   .dash-view{ margin-top: 10%}
-  .main-view .dash-head h5{ margin-bottom: 0%; border-bottom: 1px solid #E0E0E0; padding-bottom: 1%}
+  .main-view .dash-head h5{ margin-bottom: 0%; padding-bottom: 1%; color: #eeeeee}
   .main-view .dash-body .row{ margin-top: 2%}
 
   .percent-block{ margin-top: 10% !important; }
-  .percent-block .percent-text h3{ margin-bottom: 2% }
-  .percent-block .percent-text small{ font-size: 12px; color: #949494;}
+  .percent-block .percent-text h3{ margin-bottom: 2%; color: #eeeeee}
+  .percent-block .percent-text small{ font-size: 12px; color: #9e9e9e;}
 
-  .progressbar-wrapper{ position:relative; font-size:17px; width: 100%; height: 100% }
+  .progressbar-wrapper{ position:relative; font-size:17px; width: 100%; height: 100%; color: #eeeeee }
   .progressbar-percent{ position: absolute; width: 100%; text-align: center !important; top: 40% }
 
   .month-dropdown{ width: 430% }
   .month-dropdown .row{ margin: 2% }
   .month-dropdown .row a{ text-decoration: none;}
+
+  .table{ color: white }
+  .table{ border-color: #9e9e9e}
+  .table caption{ color: #bdbdbd }
+  .table tr td{ border-top-color: #546E7A !important }
 </style>
 
 
@@ -65,7 +70,7 @@
     <div class="row">
 
       <div class="col-md-6">
-        <table class="table table-hover">
+        <table class="table">
           <caption><strong>Theory Attendance</strong></caption>
           <thead>
             <td><b>#</b></td>
@@ -74,7 +79,7 @@
             <td><center><b>Total</b></center></td>
           </thead>
           <tbody>
-            <tr ng-repeat="t in attendance_home[0]">
+            <tr ng-repeat="t in attendance_home[0].att">
               <td>{{$index+1}}</td>
               <td>{{t.details[0].abv[0]}}</td>
               <td><center>{{t.attended}}</center></td>
@@ -85,7 +90,7 @@
       </div>
 
       <div class="col-md-6">
-        <table class="table table-hover">
+        <table class="table">
           <caption><strong>Lab Attendance</strong></caption>
           <thead>
             <td><b>#</b></td>
@@ -94,7 +99,7 @@
             <td><center><b>Total</b></center></td>
           </thead>
           <tbody>
-            <tr ng-repeat="l in attendance_home[1]">
+            <tr ng-repeat="l in attendance_home[1].att">
               <td>{{$index+1}}</td>
               <td>{{l.details[0].abv[0]}}</td>
               <td><center>{{l.attended}}</center></td>
@@ -118,9 +123,9 @@
                   <span>Theory</span>
                 </div>
                 <round-progress
-                max=theory_total_home
-                current=theory_attended_home
-                color="{{ getColor(theory_attended_home, theory_total_home) }}"
+                max=attendance_home[0].total
+                current=attendance_home[0].attended
+                color="{{ getColor(attendance_home[0].attended, attendance_home[0].total) }}"
                 bgolor="#eaeaea"
                 radius="45"
                 stroke="5"
@@ -135,7 +140,7 @@
             </center>
           </div>
           <div class="col-md-12 percent-text">
-            <center><h3>{{theory_avg}}%</h3><small>{{getBunk(theory_attended_home, theory_total_home)}}</small></center>
+            <center><h3>{{getPercent(attendance_home[0].attended, attendance_home[0].total)}}%</h3><small>{{getBunk(attendance_home[0].attended, attendance_home[0].total)}}</small></center>
           </div>
         </div>
       </div>
@@ -148,9 +153,9 @@
                   <span>Lab</span>
                 </div>
                 <round-progress
-                max=lab_total_home
-                current=lab_attended_home
-                color="{{ getColor(lab_attended_home, lab_total_home) }}"
+                max=attendance_home[1].total
+                current=attendance_home[1].attended
+                color="{{ getColor(attendance_home[0].attended, attendance_home[0].total) }}"
                 bgcolor="#eaeaea"
                 radius="45"
                 stroke="5"
@@ -165,7 +170,7 @@
             </center>
           </div>
           <div class="col-md-12 percent-text">
-            <center><h3>{{lab_avg}}%</h3><small>{{getBunk(lab_attended_home, lab_total_home)}}</small></center>
+            <center><h3>{{getPercent(attendance_home[1].attended, attendance_home[1].total)}}%</h3><small>{{getBunk(attendance_home[1].attended, attendance_home[1].total)}}</small></center>
           </div>
         </div>
       </div>
@@ -182,7 +187,7 @@
             <div class="input-group-btn">
               <button type="button" class="btn btn-default">Select Date</button>
             </div><!-- /btn-group -->
-            <input type="text" class="form-control datepicker" style="text-align:center" readonly>
+            <input type="text" class="form-control datepicker" style="text-align:center" readonly ng-model="user.check_daily_date" ng-change="getDaily()">
           </div><!-- /input-group -->
         </center>
     </div>
@@ -190,83 +195,44 @@
   </div>
 
   <div id="divider"></div>
-
-  <div class="row">
+  <div class="row" style="margin-top:5%">
 
     <div class="col-md-6">
-      <table class="table table-hover">
-        <caption><strong>Theory Attendance</strong></caption>
+      <table class="table">
+        <caption><b>Theory Attendance :</b></caption>
         <thead>
           <td><b>#</b></td>
-          <td><b>Student Name</b></td>
-          <td><b>Attended</b></td>
-          <td><b>Total</b></td>
+          <td><b>Subject</b></td>
+          <td><center><b>Status</b></center></td>
         </thead>
         <tbody>
-          <tr>
-            <td>1</td>
-            <td>DAA</td>
-            <td>5</td>
-            <td>5</td>
-          </tr>
-          <tr>
-            <td>1</td>
-            <td>DAA</td>
-            <td>5</td>
-            <td>5</td>
-          </tr>
-          <tr>
-            <td>1</td>
-            <td>DAA</td>
-            <td>5</td>
-            <td>5</td>
-          </tr>
-          <tr>
-            <td>1</td>
-            <td>DAA</td>
-            <td>5</td>
-            <td>5</td>
+          <tr ng-repeat="th in dailyAttendance[0]">
+            <td>{{$index+1}}</td>
+            <td><span data-toggle="tooltip" title={{th.sub_name[0]}} data-placement="right">{{th.abv[0]}}</span></td>
+            <td><center><span ng-bind-html=getStatusIcon(th.status,th.unscheduled)></span></center></td>
           </tr>
         </tbody>
       </table>
+      <center ng-show="progress"><div class="mdl-spinner mdl-js-spinner is-active"></div></center>
     </div>
 
     <div class="col-md-6">
-      <table class="table table-hover">
+      <table class="table">
         <caption><strong>Lab Attendance</strong></caption>
         <thead>
           <td><b>#</b></td>
-          <td><b>Student Name</b></td>
-          <td><b>Attended</b></td>
-          <td><b>Total</b></td>
+          <td><b>Subject</b></td>
+          <td><center><b>Status</b></center></td>
         </thead>
         <tbody>
-          <tr>
-            <td>1</td>
-            <td>DAA</td>
-            <td>5</td>
-            <td>5</td>
-          </tr>
-          <tr>
-            <td>1</td>
-            <td>DAA</td>
-            <td>5</td>
-            <td>5</td>
-          </tr>
-          <tr>
-            <td>1</td>
-            <td>DAA</td>
-            <td>5</td>
-            <td>5</td>
-          </tr>
-          <tr>
-            <td>1</td>
-            <td>DAA</td>
-            <td>5</td>
-            <td>5</td>
+          <tr ng-repeat="th in dailyAttendance[1]">
+            <td>{{$index+1}}</td>
+            <td><span data-toggle="tooltip" title={{th.sub_name[0]}} data-placement="right">{{th.abv[0]}}</span></td>
+            <td><center><span ng-bind-html=getStatusIcon(th.status,th.unscheduled)></span></center></td>
           </tr>
         </tbody>
       </table>
+      <center ng-show="progress"><div class="mdl-spinner mdl-js-spinner is-active"></div></center>
     </div>
 
   </div>
@@ -278,7 +244,7 @@
     <div class="col-md-4">
         <center>
           <div class="input-group">
-            <input type="text" class="form-control" readonly>
+            <input type="text" class="form-control" readonly ng-model="month_name" style="text-align:center">
             <div class="input-group-btn">
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Month <span class="caret"></span></button>
               <ul class="dropdown-menu dropdown-menu-right month-dropdown">
@@ -309,47 +275,111 @@
     </div>
     <div class="col-md-4"></div>
   </div>
-
-  <div class="row">
+  <div id="divider"></div>
+  <div class="row" style="margin-top:5%">
 
     <div class="col-md-6">
-      <table class="table table-hover">
-        <caption><strong>Theory Attendance</strong></caption>
+      <table class="table">
+        <caption>
+          <div class="row">
+            <div class="col-xs-10">
+              <div style="margin-top:2%">
+                <strong>Theory Attendance <span ng-show="attendance_monthly[1]">({{attendance_monthly[0].attended}}/{{attendance_monthly[0].total}})</span></strong>
+              </div>
+            </div>
+            <div class="col-xs-2">
+              <center ng-show="attendance_monthly[0]">
+                <div class="progressbar-wrapper" style="font-size:11px;">
+                  <div class="progressbar-percent ng-cloak" style="top:20%">
+                    <span>{{getPercent(attendance_monthly[0].attended, attendance_monthly[0].total)}}%</span>
+                  </div>
+                  <round-progress
+                  max=attendance_monthly[0].total
+                  current=attendance_monthly[0].attended
+                  color="{{ getColor(attendance_home[0].attended, attendance_home[0].total) }}"
+                  bgcolor="#eaeaea"
+                  radius="15"
+                  stroke="2"
+                  rounded="true"
+                  clockwise="true"
+                  responsive="responsive"
+                  duration="800"
+                  animation="easeInOutQuart"
+                  animation-delay="0"
+                  ></round-progress>
+                </div>
+              </center>
+            </div>
+          </div>
+        </caption>
         <thead>
           <td><b>#</b></td>
-          <td><b>Student Name</b></td>
+          <td><b>Subject</b></td>
           <td><center><b>Attended</b></center></td>
           <td><center><b>Total</b></center></td>
         </thead>
         <tbody>
-          <tr ng-repeat="th in attendance_monthly[0]">
+          <tr ng-repeat="th in attendance_monthly[0].att">
             <td>{{$index+1}}</td>
-            <td>{{th.details[0].abv[0]}}</td>
+            <td><span data-toggle="tooltip" title={{th.details[0].name[0]}} data-placement="right">{{th.details[0].abv[0]}}</span></td>
             <td><center>{{th.attended}}</center></td>
             <td><center>{{th.total}}</center></td>
           </tr>
         </tbody>
       </table>
+      <center ng-show="progress"><div class="mdl-spinner mdl-js-spinner is-active"></div></center>
     </div>
 
     <div class="col-md-6">
-      <table class="table table-hover">
-        <caption><strong>Lab Attendance</strong></caption>
+      <table class="table">
+        <caption>
+          <div class="row">
+            <div class="col-xs-10">
+              <div style="margin-top:2%">
+                <strong>Lab Attendance <span ng-show="attendance_monthly[1]">({{attendance_monthly[1].attended}}/{{attendance_monthly[1].total}})</span></strong>
+              </div>
+            </div>
+            <div class="col-xs-2">
+              <center ng-show="attendance_monthly[1]">
+                <div class="progressbar-wrapper" style="font-size:11px;">
+                  <div class="progressbar-percent ng-cloak" style="top:20%">
+                    <span>{{getPercent(attendance_monthly[1].attended, attendance_monthly[1].total)}}%</span>
+                  </div>
+                  <round-progress
+                  max=attendance_monthly[1].total
+                  current=attendance_monthly[1].attended
+                  color="{{ getColor(attendance_home[1].attended, attendance_home[1].total) }}"
+                  bgcolor="#eaeaea"
+                  radius="15"
+                  stroke="2"
+                  rounded="true"
+                  clockwise="true"
+                  responsive="responsive"
+                  duration="800"
+                  animation="easeInOutQuart"
+                  animation-delay="0"
+                  ></round-progress>
+                </div>
+              </center>
+            </div>
+          </div>
+        </caption>
         <thead>
           <td><b>#</b></td>
-          <td><b>Student Name</b></td>
+          <td><b>Subject</b></td>
           <td><center><b>Attended</b></center></td>
           <td><center><b>Total</b></center></td>
         </thead>
         <tbody>
-          <tr ng-repeat="th in attendance_monthly[1]">
+          <tr ng-repeat="th in attendance_monthly[1].att">
             <td>{{$index+1}}</td>
-            <td>{{th.details[0].abv[0]}}</td>
+            <td><span data-toggle="tooltip" title={{th.details[0].name[0]}} data-placement="right">{{th.details[0].abv[0]}}</span></td>
             <td><center>{{th.attended}}</center></td>
             <td><center>{{th.total}}</center></td>
           </tr>
         </tbody>
       </table>
+      <center ng-show="progress"><div class="mdl-spinner mdl-js-spinner is-active"></div></center>
     </div>
 
   </div>
@@ -386,7 +416,11 @@
     $('.datepicker').datepicker({
       todayBtn: 'linked',
       orientation: 'bottom right',
-      autoclose: true
+      autoclose: true,
+      format:"dd/mm/yyyy",
+      daysOfWeekDisabled:"0,6"
     });
+
+    $("body").tooltip({selector:'[data-toggle="tooltip"]'});
   });
 </script>
