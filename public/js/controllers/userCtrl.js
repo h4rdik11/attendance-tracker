@@ -197,21 +197,22 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
     }
 
     $scope.getColor = function(attended, total){
-      var per = (attended/total)*100;
-      if(per > 75){
+      //alert(Math.round((attended/total)*100));
+      var per = Math.round((attended/total)*100);
+      if(per < 75){
+        return "#CC3508";
+      }
+      else if(per > 75){
         return "#4A81CB";
       }
-      else if(per == 75){
-        return "#DF9308";
-      }
       else{
-        return "#CC3508";
+        return "#DF9308";
       }
     };
 
     $scope.getBunk = function(attended, total){
       if(Math.round((attended/total)*100) > 75){
-        var p = Match.round((attended/75)*100);
+        var p = Math.round((attended/75)*100);
         var b = p-total;
         return "You can bunk "+b+" classes.";
       }else if(Math.round((attended/total)*100) < 75){

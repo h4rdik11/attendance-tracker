@@ -155,7 +155,7 @@
                 <round-progress
                 max=attendance_home[1].total
                 current=attendance_home[1].attended
-                color="{{ getColor(attendance_home[0].attended, attendance_home[0].total) }}"
+                color="{{ getColor(attendance_home[1].attended, attendance_home[1].total) }}"
                 bgcolor="#eaeaea"
                 radius="45"
                 stroke="5"
@@ -284,7 +284,7 @@
           <div class="row">
             <div class="col-xs-10">
               <div style="margin-top:2%">
-                <strong>Theory Attendance <span ng-show="attendance_monthly[1]">({{attendance_monthly[0].attended}}/{{attendance_monthly[0].total}})</span></strong>
+                <strong>Theory Attendance <span ng-show="attendance_monthly[0]">({{attendance_monthly[0].attended}}/{{attendance_monthly[0].total}})</span></strong>
               </div>
             </div>
             <div class="col-xs-2">

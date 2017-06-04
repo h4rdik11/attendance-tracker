@@ -52,7 +52,9 @@
       body{ background: none; }
       a .fa{ text-decoration: none; color:white}
       .small-screen-home{ font-size: 20px}
-
+      .dropdown .dropdown-toggle, .home .home-icon{ padding: 10% 20%; font-size: 20px ;border-radius: 20px; background-color: #26A69A; color: #263238; }
+      .user-name{ padding: 5% 5% 5% 5%; color: #263238; font-size: 15px; font-weight: 600; text-align: center }
+      .mdl-navigation .fa{ color: #263238 }
     </style>
 
   </head>
@@ -67,7 +69,22 @@
         <div class="mdl-layout-spacer"></div>
         <!-- Navigation. We hide it in small screens. -->
         <nav class="mdl-navigation mdl-layout--large-screen-only">
-          <a class="mdl-navigation__link" href="">User</a>
+          <a class="mdl-navigation__link" href="">
+            <div class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user" aria-hidden="true"></i></a>
+              <ul class="dropdown-menu pull-right" style="margin-top: 50%">
+                <li class="user-name"><span>{{ loggedUser.name }}</span></li>
+                <li role="separator" class="divider"></li>
+                <li><a ui-sref="/update-profile"><i class="fa fa-cog" aria-hidden="true"></i>&nbsp;Update Profile</a></li>
+                <li><a href="" ng-click="logout()"><i class="fa fa-sign-out" aria-hidden="true"></i>&nbsp;Logout</a></li>
+              </ul>
+            </div>
+          </a>
+          <a class="mdl-navigation__link home" href="">
+            <div class="home">
+              <span class="home-icon"><i class="fa fa-home" aria-hidden="true"></i></span>
+            </div>
+          </a>
         </nav>
         <nav class="mdl-navigation mdl-layout--small-screen-only">
           <a ui-sref="/" ng-click=changeView("home") class="mdl-navigation__link small-screen-home"><i class="fa fa-home" aria-hidden="true" style="color:#00BCD4"></i></a>
@@ -79,11 +96,9 @@
 
           <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect"
               for="demo-menu-lower-right">
-            <li class="mdl-menu__item">Some Action</li>
-            <li class="mdl-menu__item">Another Action</li>
-            <li disabled class="mdl-menu__item">Disabled Action</li>
-            <li class="mdl-menu__item">Yet Another Action</li>
-          </ul>
+              <li><a ui-sref="/update-profile" ng-click="setTitle('Update Profile')"><i class="fa fa-cog" aria-hidden="true"></i>&nbsp;Update Profile</a></li>
+              <li><a href="" ng-click="logout()"><i class="fa fa-sign-out" aria-hidden="true"></i>&nbsp;Logout</a></li>
+            </ul>
         </nav>
       </div>
     </header>
