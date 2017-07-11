@@ -333,4 +333,25 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
        });
     };
 
+    $scope.getOverall = function(sem){
+      $http.get(protocol+"//"+host+"/api/get-overall-theory?user="+$scope.loggedUser._id+"&sem="+sem+"&token="+$auth.getToken()).then(function(response){
+        $scope.theory_overall = response.data;
+        $scope.theory_overall_attended = 0;
+        $scope.theory_overall_total = 0;
+        for(var i = 0;i < $scope.theory_overall.length; i++ ){
+          $scope.theory_overall_attended += parseInt($scope.theory_overall[i].attended);
+          $scope.theory_overall_total += parseInt($scope.theory_overall[i].total);
+        }
+      });
+      $http.get(protocol+"//"+host+"/api/get-overall-lab?user="+$scope.loggedUser._id+"&sem="+sem+"&token="+$auth.getToken()).then(function(response){
+        $scope.lab_overall = response.data;
+        $scope.lab_overall_attended = 0;
+        $scope.lab_overall_total = 0;
+        for(var i = 0;i < $scope.lab_overall.length; i++ ){
+          $scope.lab_overall_attended += parseInt($scope.lab_overall[i].attended);
+          $scope.lab_overall_total += parseInt($scope.lab_overall[i].total);
+        }
+      });
+    };
+
 });

@@ -393,6 +393,100 @@ module.exports = function(app){
       });
     });
 
+    /* Get overall attendance */
+    app.get("/api/get-overall-theory", function(req, res){
+      Attendance.aggregate([
+        {
+          $lookup:{
+            from: "subjects",
+            localField: "sub_id",
+            foreignField: "_id",
+            as: "subjects"
+          }
+        },
+        {
+          $project:{
+            "_id": 1,
+            "stud_id": 1,
+            "sub_id": 1,
+            "status": 1,
+            "unscheduled": 1,
+            "date": 1,
+            "abv":"$subjects.abv",
+            "name":"$subjects.name",
+            "sem":"$subjects.sem"
+          }
+        },
+        {
+          $match:{
+            $and:[
+              {"stud_id": new ObjectId(req.query.user)},
+              {"sem": {$regex:req.query.sem}},
+              {"abv": {$not:/LAB.*/}}
+            ]
+          }
+        },
+        {
+          $group:{
+            _id: "$sub_id",
+            details:{$push:"$$ROOT"},
+            attended:{$sum:{$cond:{if:{$eq:["$status",true]}, then:1, else:0}}},
+            total: {$sum:1}
+          }
+        }
+      ], function(err, result){
+        if(err) res.send("Error : please report the matter at hardik11.chauhan@gmail.com");
+        else res.json(result);
+      });
+    });
+
+    /* Getting lab overall */
+    app.get("/api/get-overall-lab", function(req, res){
+      Attendance.aggregate([
+        {
+          $lookup:{
+            from: "subjects",
+            localField:"sub_id",
+            foreignField: "_id",
+            as:"subjects"
+          }
+        },
+        {
+          $project:{
+            "_id": 1,
+            "stud_id": 1,
+            "sub_id": 1,
+            "status": 1,
+            "unscheduled": 1,
+            "date": 1,
+            "abv":"$subjects.abv",
+            "name":"$subjects.name",
+            "sem":"$subjects.sem"
+          }
+        },
+        {
+          $match:{
+            $and:[
+              {"stud_id":new ObjectId(req.query.user)},
+              {"sem":{$regex:req.query.sem}},
+              {"abv": {$regex:"LAB"}}
+            ]
+          }
+        },
+        {
+          $group:{
+            _id:"$sub_id",
+            details:{$push:"$$ROOT"},
+            attended:{$sum:{$cond:{if:{$eq:["$status",true]}, then:1, else:0}}},
+            total:{$sum:1}
+          }
+        }
+      ], function(err, result){
+        if(err) res.send("Error : please report the matter at hardik11.chauhan@gmail.com");
+        else res.json(result);
+      });
+    });
+
   /* Frontend Routes */
   app.get('/user', function(req,res){
     // res.send(__dirname);

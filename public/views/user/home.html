@@ -396,18 +396,126 @@
           <div class="input-group-btn">
             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Sem <span class="caret"></span></button>
             <ul class="dropdown-menu dropdown-menu-right">
-              <li><a href="#">1</a></li>
-              <li><a href="#">2</a></li>
-              <li><a href="#">3</a></li>
-              <li><a href="#">4</a></li>
-              <li><a href="#">5</a></li>
-              <li><a href="#">6</a></li>
+              <li><a href="#" ng-click="getOverall(1)">1</a></li>
+              <li><a href="#" ng-click="getOverall(2)">2</a></li>
+              <li><a href="#" ng-click="getOverall(3)">3</a></li>
+              <li><a href="#" ng-click="getOverall(4)">4</a></li>
+              <li><a href="#" ng-click="getOverall(5)">5</a></li>
+              <li><a href="#" ng-click="getOverall(6)">6</a></li>
             </ul>
           </div>
         </div>
       </center>
     </div>
     <div class="col-xs-3"></div>
+  </div>
+  <div id="divider"></div>
+  <div class="row" style="margin-top:5%">
+
+    <div class="col-md-6">
+      <table class="table">
+        <caption>
+          <div class="row">
+            <div class="col-xs-10">
+              <div style="margin-top:2%">
+                <strong>Theory Attendance <span ng-show="theory_overall">({{theory_overall_attended}}/{{theory_overall_total}})</span></strong>
+              </div>
+            </div>
+            <div class="col-xs-2">
+              <center ng-show="theory_overall">
+                <div class="progressbar-wrapper" style="font-size:11px;">
+                  <div class="progressbar-percent ng-cloak" style="top:20%">
+                    <span>{{getPercent(theory_overall_attended,theory_overall_total)}}%</span>
+                  </div>
+                  <round-progress
+                  max=theory_overall_total
+                  current=theory_overall_attended
+                  color="{{ getColor(theory_overall_attended,theory_overall_total) }}"
+                  bgcolor="#eaeaea"
+                  radius="15"
+                  stroke="2"
+                  rounded="true"
+                  clockwise="true"
+                  responsive="responsive"
+                  duration="800"
+                  animation="easeInOutQuart"
+                  animation-delay="0"
+                  ></round-progress>
+                </div>
+              </center>
+            </div>
+          </div>
+        </caption>
+        <thead>
+          <td><b>#</b></td>
+          <td><b>Subject</b></td>
+          <td><center><b>Attended</b></center></td>
+          <td><center><b>Total</b></center></td>
+        </thead>
+        <tbody>
+          <tr ng-repeat="th in theory_overall">
+            <td>{{$index+1}}</td>
+            <td><span data-toggle="tooltip" title={{th.details[0].name[0]}} data-placement="right">{{th.details[0].abv[0]}}</span></td>
+            <td><center>{{th.attended}}</center></td>
+            <td><center>{{th.total}}</center></td>
+          </tr>
+        </tbody>
+      </table>
+      <center ng-show="progress"><div class="mdl-spinner mdl-js-spinner is-active"></div></center>
+    </div>
+
+    <div class="col-md-6">
+      <table class="table">
+        <caption>
+          <div class="row">
+            <div class="col-xs-10">
+              <div style="margin-top:2%">
+                <strong>Lab Attendance <span ng-show="lab_overall">({{lab_overall_attended}}/{{lab_overall_total}})</span></strong>
+              </div>
+            </div>
+            <div class="col-xs-2">
+              <center ng-show="lab_overall">
+                <div class="progressbar-wrapper" style="font-size:11px;">
+                  <div class="progressbar-percent ng-cloak" style="top:20%">
+                    <span>{{getPercent(lab_overall_attended, lab_overall_total)}}%</span>
+                  </div>
+                  <round-progress
+                  max=lab_overall_total
+                  current=lab_overall_attended
+                  color="{{ getColor(lab_overall_attended, lab_overall_total) }}"
+                  bgcolor="#eaeaea"
+                  radius="15"
+                  stroke="2"
+                  rounded="true"
+                  clockwise="true"
+                  responsive="responsive"
+                  duration="800"
+                  animation="easeInOutQuart"
+                  animation-delay="0"
+                  ></round-progress>
+                </div>
+              </center>
+            </div>
+          </div>
+        </caption>
+        <thead>
+          <td><b>#</b></td>
+          <td><b>Subject</b></td>
+          <td><center><b>Attended</b></center></td>
+          <td><center><b>Total</b></center></td>
+        </thead>
+        <tbody>
+          <tr ng-repeat="th in lab_overall">
+            <td>{{$index+1}}</td>
+            <td><span data-toggle="tooltip" title={{th.details[0].name[0]}} data-placement="right">{{th.details[0].abv[0]}}</span></td>
+            <td><center>{{th.attended}}</center></td>
+            <td><center>{{th.total}}</center></td>
+          </tr>
+        </tbody>
+      </table>
+      <center ng-show="progress"><div class="mdl-spinner mdl-js-spinner is-active"></div></center>
+    </div>
+
   </div>
 </div>
 
