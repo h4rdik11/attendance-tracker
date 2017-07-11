@@ -2,44 +2,58 @@
 
   .page-header h4{ font-size: 32px }
   .page-header h4 small{ font-size: 15px }
-  .help-block{ margin: 0px; color:#BFBFBF }
+  .help-block{ margin: 0px; color:#616161 }
+  .main-block{ margin: 5% 1% 5% 1% ; background-color: rgba(238,228,216,0.85); padding: 5%}
+  .btn{ border-radius: 0px}
 
 </style>
 <div class="container">
-  <div class="page-header">
-    <h4>Join Portal<br><small>Keep track of your attendance on the go.</small></h4>
-  </div>
-  <div class="row">
-    <div class="col-md-6">
-      <form class="form-horizontal" ng-submit="addUser()">
-        <div class="form-group">
-          <label for="name">Name</label>
-          <input type="text" id="name" class="form-control" ng-model="user.name" placeholder="Name" required>
-          <p class="help-block">This will be displayed on your dashboard.</p>
-        </div>
-        <div class="form-group">
-          <label for="name">User Name</label>
-          <input type="text" id="name" class="form-control" ng-model="user.uname" placeholder="User Name" required>
-          <p class="help-block">You can use this as your login id.</p>
-        </div>
-        <div class="form-group">
-          <label for="email">Email Id</label>
-          <input type="email" id="email" class="form-control" ng-model="user.email" placeholder="Email" required>
-          <p class="help-block">Or you can use this instead.</p>
-        </div>
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input type="password" id="password" class="form-control" ng-model="user.password" placeholder="Password" required>
-        </div>
-        <p class="help-block">
-          By clicking on "Create your account" below, you are free to track your attendance without accepting any Terms and Condition or stuff like that. So go ahead :)
-        </p>
-        <hr>
-        <button type="submit" class="btn btn-success">Create an account</button>
-      </form>
+  <div class="main-block">
+    <div class="page-header" style=" border-bottom: 0.5px solid rgba(3,5,28, 0.3)">
+      <h4>Join Portal<br><small style="color: #616161 !important">Keep track of your attendance on the go.</small></h4>
     </div>
-    <div class="col-md-4">
-      <button ng-click="authenticate('google')">Sign in with google.</button>
+    <div class="row" style="padding: 2%">
+      <div class="col-md-6">
+        <form class="form-horizontal" ng-submit="addUser()">
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" class="form-control" ng-model="user.name" placeholder="Name" required>
+            <p class="help-block">This will be displayed on your dashboard.</p>
+          </div>
+          <div class="form-group">
+            <label for="name">User Name</label>
+            <input type="text" id="name" class="form-control" ng-model="user.uname" placeholder="User Name" required>
+            <p class="help-block">You can use this as your login id.</p>
+          </div>
+          <div class="form-group">
+            <label for="name">Semester</label>
+            <select  id="name" class="form-control" ng-model="user.sem" required>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+            </select>
+            <p class="help-block">Dont worry this can be changed later.</p>
+          </div>
+          <div class="form-group">
+            <label for="email">Email Id</label>
+            <input type="email" id="email" class="form-control" ng-model="user.email" placeholder="Email" required>
+            <p class="help-block">Or you can use this instead.</p>
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" class="form-control" ng-model="user.password" placeholder="Password" required>
+            <p class="help-block">Shhhhh..</p>
+          </div>
+          <p class="help-block" style="color: black">
+            By clicking on "Create your account" below, you are free to track your attendance without accepting any Terms and Condition or stuff like that except that this portal will work as a personal tracker only and will be inadmissible as a proof of some sorts. So go ahead :)
+          </p>
+          <hr style=" border-top: 0.5px solid rgba(3,5,28, 0.3)">
+          <button type="submit" class="btn btn-success mdl-shadow--4dp">Create an account</button>
+        </form>
+      </div>
     </div>
   </div>
 </div>

@@ -32,6 +32,22 @@ module.exports = function(app){
     });
   });
 
+  //creating user
+  app.post('/api/add-user', function(req, res){
+    //res.send(req.body.sem);
+    User.findOne({email : req.body.email, uname : req.body.uname }, function(err, exists){
+      if(exists){
+        res.send("2");
+      }else{
+        var u = new User(req.body);
+        u.save(function(err, result){
+          if(err) res.end(JSON.stringify(err));
+          else res.status(200).send({msg:"1"});
+        });
+      }
+    });
+  });
+
   //token authentication middleware
   app.use( function(req, res, next){
     var token = req.body.token || req.query.token || req.header['x-access-token'];
@@ -59,21 +75,6 @@ module.exports = function(app){
     });
   });
 
-  //creating user
-  app.post('/api/add-user', function(req, res){
-    //res.send(req.body.sem);
-    User.findOne({email : req.body.email, uname : req.body.uname }, function(err, exists){
-      if(exists){
-        res.send("2");
-      }else{
-        var u = new User(req.body);
-        u.save(function(err, result){
-          if(err) res.end(JSON.stringify(err));
-          else res.status(200).send({token : createToken(result), msg:"1"});
-        });
-      }
-    });
-  });
 
   //adding subjects
   app.post('/api/add-subject', function(req, res){
@@ -86,7 +87,7 @@ module.exports = function(app){
 
   //getting subjects(theory)
   app.get('/api/get-subject-theory', function(req, res){
-    Subject.find({"course" : req.query.course, "sem" : req.query.sem, "abv" : {$not:/LAB.*/}}, function(err, result){
+    Subject.find({"course" : "MCA", "sem" : req.query.sem, "abv" : {$not:/LAB.*/}}, function(err, result){
       if(err){
         res.send("No subject found");
       }else{
@@ -96,7 +97,7 @@ module.exports = function(app){
   });
   //getting subjects (Lab)
   app.get('/api/get-subject-lab',function(req, res){
-    Subject.find({"course" : req.query.course, "sem" : req.query.sem, "abv": {$regex:"LAB"}}, function(err, result){
+    Subject.find({"course" : "MCA", "sem" : req.query.sem, "abv": {$regex:"LAB"}}, function(err, result){
       if(err) res.send("No subject found");
       else res.json(result);
     });

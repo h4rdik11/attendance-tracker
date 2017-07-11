@@ -1,10 +1,11 @@
 <style>
-  .login-block{ margin-top: 20%; background-color: #fff; }
+  .login-block{ margin-top: 20%; background-color: rgba(238,228,216,0.85); }
   .login-block .content{ padding: 2% 10% 5% 10%; }
   .login-block .header h2{ text-align: center; padding-top: 5%}
-  .login-block .footer{ text-align: center; border-top: 0.5px solid #E5E5E5; padding: 3%; }
+  .login-block .footer{ text-align: center; border-top: 0.5px solid rgba(3,5,28, 0.3); padding: 3%; }
   .form-group button{ margin-top: 5% !important;  }
   .trouble-link { text-align: center; }
+  .btn{ border-radius: 0px}
 
 </style>
 <div class="main-block">
@@ -28,18 +29,12 @@
               <div class="form-group">
                 <input class="form-control" type="password" ng-model="userLogin.password" placeholder="Password">
               </div>
-              <div class="checkbox">
-                <label>
-                  <input type="checkbox">
-                  Remember me on this computer.
-                </label>
-              </div>
               <div class="form-group">
-                <button type="submit" class="form-control btn btn-primary">Sign In</button>
+                <button type="submit" class="form-control btn btn-primary mdl-shadow--4dp">Sign In</button>
               </div>
-              <div class="trouble-link">
+              <!-- <div class="trouble-link">
                 <a ui-sref="/register" class="btn btn-link">Trouble logging in ?</a>
-              </div>
+              </div> -->
             </form>
           </div>
           <div class="footer">
