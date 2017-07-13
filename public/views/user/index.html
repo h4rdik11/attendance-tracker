@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>Bootstrap 101 Template</title>
+    <title>Attendance Tracker</title>
 
     <!-- Bootstrap -->
     <link rel="stylesheet" href="libs/bootstrap/dist/css/bootstrap.min.css">
@@ -55,9 +55,20 @@
       .user-name{ padding: 5% 5% 5% 5%; color: #263238; font-size: 15px; font-weight: 600; text-align: center }
       .mdl-navigation .fa{ color: #263238 }
       .side-dropdown li{ margin-left: 10%}
+      .mdl-layout-title a{ text-decoration: none; color: #26a69a }
+      .drawer{ height: 15%; padding-bottom: 10%}
+      .drawer h4{ font-weight: bold; font-size: 22px;color: #26a69a; text-transform: uppercase;}
+      .drawer small{ font-weight: bold; font-size: 18px ;color: #0097A7; text-transform: uppercase;}
+      #drawer-nav a, #drawer-nav a i{ font-weight: bold; font-size: 15px; padding: 4% 5% 3% 8%; color: #26C6DA}
 
       @media only screen and (max-width: 768px) {
         .mdl-layout__content{ margin-left: 0px; margin-right: 0px}
+      }
+
+      @media only screen and (min-width: 1200px){
+        .drawer{ height: 18%; padding-bottom: 15%}
+        .drawer h4{ font-weight: bold; font-size: 22px;color: #26a69a; text-transform: uppercase;}
+        .drawer small{ font-weight: bold; font-size: 18px ;color: #0097A7; text-transform: uppercase;}
       }
 
     </style>
@@ -69,7 +80,7 @@
     <header class="mdl-layout__header mdl-color--blue-grey-900">
       <div class="mdl-layout__header-row">
         <!-- Title -->
-        <span class="mdl-layout-title">{{loggedUser.name}}</span>
+        <span class="mdl-layout-title"></span>
         <!-- Add spacer, to align navigation to the right -->
         <div class="mdl-layout-spacer"></div>
         <!-- Navigation. We hide it in small screens. -->
@@ -80,22 +91,17 @@
               <ul class="dropdown-menu pull-right" style="margin-top: 50%">
                 <li class="user-name"><span>{{ loggedUser.name }}</span></li>
                 <li role="separator" class="divider"></li>
-                <li><a ui-sref="/edit-profile">Update Profile</a></li>
-                <li><a href="" ng-click="logout()">Logout</a></li>
+                <li><a ui-sref="/" ng-click=changeView("home")><i class="fa fa-home" aria-hidden="true"></i>&nbsp;&nbsp;Home</a></li>
+                <li><a ui-sref="/edit-profile"><i class="fa fa-cog" aria-hidden="true"></i>&nbsp;&nbsp;Update Profile</a></li>
+                <li><a href="" ng-click="logout()"><i class="fa fa-sign-out" aria-hidden="true"></i>&nbsp;&nbsp;Logout</a></li>
               </ul>
-            </div>
-          </a>
-          <a class="mdl-navigation__link home" href="">
-            <div class="home">
-              <span class="home-icon"><i class="fa fa-home" aria-hidden="true"></i></span>
             </div>
           </a>
         </nav>
         <nav class="mdl-navigation mdl-layout--small-screen-only">
           <a ui-sref="/" ng-click=changeView("home") class="mdl-navigation__link small-screen-home"><i class="fa fa-home" aria-hidden="true" style="color:#00BCD4"></i></a>
           <!-- Right aligned menu below button -->
-          <button id="demo-menu-lower-right"
-                  class="mdl-button mdl-js-button mdl-button--icon">
+          <button id="demo-menu-lower-right" class="mdl-button mdl-js-button mdl-button--icon">
             <i class="material-icons">more_vert</i>
           </button>
 
@@ -106,12 +112,12 @@
         </nav>
       </div>
     </header>
-    <div class="mdl-layout__drawer">
-      <span class="mdl-layout-title">Title</span>
-      <nav class="mdl-navigation">
-        <a class="mdl-navigation__link" ui-sref="/">Dashboard</a>
-        <a class="mdl-navigation__link" ui-sref="/mark-attendance">Mark Attendance</a>
-        <a class="mdl-navigation__link" href="" ng-click="logout()">Logout</a>
+    <div class="mdl-layout__drawer mdl-color--blue-grey-700" style="border: none">
+      <span class="mdl-layout-title drawer mdl-color--blue-grey-900 madl-shadow--6dp"><h4>{{loggedUser.name}}<br><small>(Sem : {{loggedUser.sem}})</small></h4></span>
+      <nav class="mdl-navigation" id="drawer-nav">
+        <a class="mdl-navigation__link drawer-link" ui-sref="/" ng-click=changeView("home")><i class="fa fa-tachometer" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;Dashboard</a>
+        <a class="mdl-navigation__link drawer-link" ui-sref="/mark-attendance"><i class="fa fa-calendar-check-o" aria-hidden="true">&nbsp;&nbsp;&nbsp;</i>Mark Attendance</a>
+        <a class="mdl-navigation__link drawer-link" href="" ng-click="logout()"><i class="fa fa-sign-out" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;Logout</a>
       </nav>
     </div>
     <main class="mdl-layout__content container  mdl-color--blue-grey-700">

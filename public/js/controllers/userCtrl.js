@@ -146,7 +146,8 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
     };
 
     $scope.checkUnschduledLab = function(index){
-        $scope.attendance_lab[index].status = false;
+      $scope.attendance_lab[index].status1 = false;
+      $scope.attendance_lab[index].status2 = false;
     };
 
     $scope.checkStatusLab = function(index){
@@ -160,14 +161,15 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
           $scope.callSnack("Please select a date.");
         }
         else{
-          var att = [];
+          var attTheory = [];
+          var attLab = [];
           for(var i = 0; i<$scope.attendance_theory.length; i++){
             $scope.attendance_theory[i].date = $scope.user.date;
-            att.push($scope.attendance_theory[i]);
+            attTheory.push($scope.attendance_theory[i]);
           }
           for(var i = 0; i<$scope.attendance_lab.length; i++){
             $scope.attendance_lab[i].date = $scope.user.date;
-            att.push($scope.attendance_lab[i]);
+            attLab.push($scope.attendance_lab[i]);
           }
 
           $http.get(protocol+"//"+host+"/api/check-attendance?date="+$scope.user.date+"&user="+$scope.loggedUser._id+"&token="+$auth.getToken()).then(function(response){
@@ -175,8 +177,22 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
               $scope.callSnack("Attendance already marked for the day.");
             }
             else{
-              $http.post(protocol+"//"+host+"/api/mark-attendance?token="+$auth.getToken(), att).then(function(response){
-                $scope.callSnack(response.data);
+              var success = false;
+              $http.post(protocol+"//"+host+"/api/mark-attendance?token="+$auth.getToken(), attTheory).then(function(response){
+                if(response.data === "success"){
+                  $http.post(protocol+"//"+host+"/api/mark-attendance-lab?token="+$auth.getToken(), attLab).then(function(res){
+                    if(res.data === "success"){
+                      $scope.initFun();
+                      $scope.callSnack("Attendance marked successfully.");
+                    }
+                    else{
+                      $scope.callSnack("Error : please contact hardik11.chauhan@gmail.com");
+                    }
+                  });
+                }
+                else{
+                  $scope.callSnack("Error : please contact hardik11.chauhan@gmail.com");
+                }
               });
             }
           });
@@ -253,12 +269,13 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
     $scope.attendance_monthly = [];
     $scope.progress = false;
     $scope.attendanceMonthly = function(month){
+      $scope.month_name = month;
       var m = parseInt(month);
       $scope.progress = true;
       $scope.month_name = $scope.month_arr[m-1];
       var year = new Date().getFullYear();
       var date = year+"-"+month;
-      $scope.attendance_monthly = $scope.getAtt(date);
+      $scope.attendance_monthly = $scope.getAtt(date, $scope.userDetails.sem);
     };
 
     $scope.getPercent = function(attended, total){
@@ -285,6 +302,15 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
       else{
         if(status === true) return $sce.trustAsHtml('<i data-toggle="tooltip" title="Present" data-placement="bottom" class="fa fa-user" aria-hidden="true" style="color:#4caf50"></i>');
         else return $sce.trustAsHtml('<i data-toggle="tooltip" title="Absent" data-placement="bottom" class="fa fa-user-o " aria-hidden="true" style="color:#d32f2f"></i>');
+      }
+    };
+    $scope.getStatusIconLab = function(status1, status2, unscheduled){
+      if(unscheduled === true) return $sce.trustAsHtml('<i data-toggle="tooltip" title="No Class" data-placement="bottom" class="fa fa-ban text-warning" aria-hidden="true" style="color:#d32f2f"></i>');
+      else{
+        if(status1 === true && status2 === true) return $sce.trustAsHtml('<i data-toggle="tooltip" title="Present" data-placement="bottom" class="fa fa-user" aria-hidden="true" style="color:#4caf50"></i>&nbsp;&nbsp;<i data-toggle="tooltip" title="Present" data-placement="bottom" class="fa fa-user" aria-hidden="true" style="color:#4caf50"></i>');
+        else if(status1 === true && status2 === false) return $sce.trustAsHtml('<i data-toggle="tooltip" title="Present" data-placement="bottom" class="fa fa-user" aria-hidden="true" style="color:#4caf50"></i>&nbsp;&nbsp;<i data-toggle="tooltip" title="Absent" data-placement="bottom" class="fa fa-user-o " aria-hidden="true" style="color:#d32f2f"></i>');
+        else if(status1 === false && status2 === true) return $sce.trustAsHtml('<i data-toggle="tooltip" title="Absent" data-placement="bottom" class="fa fa-user-o " aria-hidden="true" style="color:#d32f2f"></i>&nbsp;&nbsp;<i data-toggle="tooltip" title="Present" data-placement="bottom" class="fa fa-user" aria-hidden="true" style="color:#4caf50"></i>');
+        else return $sce.trustAsHtml('<i data-toggle="tooltip" title="Absent" data-placement="bottom" class="fa fa-user-o " aria-hidden="true" style="color:#d32f2f"></i>&nbsp;&nbsp;<i data-toggle="tooltip" title="Absent" data-placement="bottom" class="fa fa-user-o " aria-hidden="true" style="color:#d32f2f"></i>');
       }
     };
 
@@ -323,16 +349,18 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
         $scope.edit_lab[index].unscheduled = false;
       };
       $scope.checkUnschduledLabEdit = function(index){
-        $scope.edit_lab[index].status = false;
+        $scope.edit_lab[index].status1 = false;
+        $scope.edit_lab[index].status2 = false;
       };
     };
 
     $scope.updateAttendance = function(){
       var dt = $scope.user.edit_date.split("/");
       date = dt[2]+"-"+dt[1]+"-"+dt[0];
-      var data = [];
+      var dataTheory = [];
+      var dataLab = [];
       for(var i = 0; i<$scope.edit_theory.length; i++){
-        data.push({
+        dataTheory.push({
           "_id":$scope.edit_theory[i]._id,
           "stud_id":$scope.edit_theory[i].stud_id,
           "sub_id":$scope.edit_theory[i].sub_id,
@@ -342,30 +370,42 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
         });
       }
       for(var i = 0; i<$scope.edit_lab.length; i++){
-        data.push({
+        dataLab.push({
           "_id":$scope.edit_lab[i]._id,
           "stud_id":$scope.edit_lab[i].stud_id,
           "sub_id":$scope.edit_lab[i].sub_id,
-          "status":$scope.edit_lab[i].status,
+          "status1":$scope.edit_lab[i].status1,
+          "status2":$scope.edit_lab[i].status2,
           "unscheduled":$scope.edit_lab[i].unscheduled,
           "date":$scope.edit_lab[i].date
         });
       }
       $http.post("/api/update-attendance?token="+$auth.getToken(), {
-        "data" : data
+        "data" : dataTheory
       }).then(function(response){
-        $scope.callSnack(response.data);
-       });
+        if(response.data === "success"){
+          $http.post("/api/update-attendance-lab?token="+$auth.getToken(), {
+            "data" : dataLab
+          }).then(function(res){
+            if(res.data === "success"){
+              $scope.initFun();
+              $scope.callSnack("Attendance updated successfully.");
+            }
+          });
+        }
+        else{ $scope.callSnack("Error : contact hardik11.chauhan@gmail.com"); }
+      });
     };
 
     $scope.getOverall = function(sem){
+      $scope.overall_sem = sem;
       $http.get(protocol+"//"+host+"/api/get-overall-theory?user="+$scope.loggedUser._id+"&sem="+sem+"&token="+$auth.getToken()).then(function(response){
         $scope.theory_overall = response.data;
         $scope.theory_overall_attended = 0;
         $scope.theory_overall_total = 0;
         for(var i = 0;i < $scope.theory_overall.length; i++ ){
-          $scope.theory_overall_attended += parseInt($scope.theory_overall[i].attended);
-          $scope.theory_overall_total += parseInt($scope.theory_overall[i].total);
+          $scope.theory_overall_attended += parseFloat($scope.theory_overall[i].attended);
+          $scope.theory_overall_total += parseFloat($scope.theory_overall[i].total);
         }
       });
       $http.get(protocol+"//"+host+"/api/get-overall-lab?user="+$scope.loggedUser._id+"&sem="+sem+"&token="+$auth.getToken()).then(function(response){
@@ -373,8 +413,8 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
         $scope.lab_overall_attended = 0;
         $scope.lab_overall_total = 0;
         for(var i = 0;i < $scope.lab_overall.length; i++ ){
-          $scope.lab_overall_attended += parseInt($scope.lab_overall[i].attended);
-          $scope.lab_overall_total += parseInt($scope.lab_overall[i].total);
+          $scope.lab_overall_attended += parseFloat($scope.lab_overall[i].attended);
+          $scope.lab_overall_total += parseFloat($scope.lab_overall[i].total);
         }
       });
     };

@@ -1,5 +1,6 @@
 var User = require("./models/user");
 var Attendance = require("./models/attendance");
+var AttendanceLab = require("./models/attendanceLab");
 var Subject = require("./models/subject");
 var jwt = require("jwt-simple");
 var moment = require("moment");
@@ -129,10 +130,16 @@ module.exports = function(app){
     var date = req.query.date.split("/");
     var dt = date[2]+"-"+date[1]+"-"+date[0];
     var user = req.query.user;
+    var cool = false;
     //Attendance.aggregate([{$lookup:{from:"users",localField:"stud_id",foreignField:"_id",as:"user"}}]).forEach(printjson)
     Attendance.find({$and:[{"stud_id":user},{"date":dt}]}, function(err, exists){
       if(exists.length > 0) res.send("exists");
-      else res.send("you can enter");
+      else{
+        AttendanceLab.find({$and:[{"stud_id":user},{"date":dt}]}, function(err, exists){
+          if(exists.length > 0) res.send("exists");
+          else res.send("you can enter");
+        });
+      }
     });
   });
   app.post('/api/mark-attendance', function(req, res){
@@ -147,7 +154,21 @@ module.exports = function(app){
         if(err) res.send("Error : Contact hardik11.chauhan@gmail.com");
       });
     }
-    res.send("Attendance marked successfully.");
+    res.send("success");
+  });
+  app.post('/api/mark-attendance-lab', function(req, res){
+    var success = false;
+    for(var i =0; i<req.body.length; i++){
+      var success = false;
+      var dt = req.body[i].date.split("/");
+      var date = dt[2]+"-"+dt[1]+"-"+dt[0];
+      req.body[i].date = date;
+      var a = new AttendanceLab(req.body[i]);
+      a.save(function(err, pass){
+        if(err) res.send("Error : Contact hardik11.chauhan@gmail.com");
+      });
+    }
+    res.send("success");
   });
 
   //update attendance
@@ -163,10 +184,28 @@ module.exports = function(app){
           }
         },
         function(err, result){
-          if(err) res.send("Error : Contact hardik11.chauhan@gmail.com");;
+          if(err) res.send("error");;
         });
     }
-    res.send("Attendance updated successfully.");
+    res.send("success");
+  });
+  app.post("/api/update-attendance-lab", function(req, res){
+    var success = true;
+    for(var i = 0; i<req.body.data.length; i++){
+      AttendanceLab.update(
+        {"_id":new ObjectId(req.body.data[i]._id)},
+        {
+          $set:{
+            "status1":req.body.data[i].status1,
+            "status2":req.body.data[i].status2,
+            "unscheduled":req.body.data[i].unscheduled
+          }
+        },
+        function(err, result){
+          if(err) res.send("error");;
+        });
+    }
+    res.send("success");
   });
 
   //getting attendance
@@ -223,7 +262,7 @@ module.exports = function(app){
     });
 
     app.get("/api/get-home-lab", function(req, res){
-      Attendance.aggregate([
+      AttendanceLab.aggregate([
         {
           $lookup:{
             from:"subjects",
@@ -236,7 +275,8 @@ module.exports = function(app){
           $project:{
             "sub_id":1,
             "stud_id":1,
-            "status":1,
+            "status1":1,
+            "status2":1,
             "unscheduled":1,
             "date":1,
             "abv":"$subjects.abv",
@@ -250,8 +290,7 @@ module.exports = function(app){
               {"stud_id": new ObjectId(req.query.user)},
               {"date":{$regex:"^"+req.query.date}},
               {"unscheduled":false},
-              {"sem": {$regex:req.query.sem}},
-              {"abv":{$regex:"LAB"}}
+              {"sem": {$regex:req.query.sem}}
             ]
           }
         },
@@ -259,7 +298,35 @@ module.exports = function(app){
           $group:{
             _id:"$sub_id",
             details:{$push:"$$ROOT"},
-            attended:{$sum:{$cond:{if:{$eq:["$status",true]}, then:1, else:0}}},
+            attended:{
+              $sum:{
+                $cond:{
+                  if:{
+                    $and:[
+                      {$eq:["$status1",true]},
+                      {$eq:["$status2",true]}
+                    ]
+                  },
+                  then:1,
+                  else:{
+                    $cond:{
+                      if:{
+                        $or:[
+                          {
+                            $and:[{$eq:["$status1", true]},{$eq:["$status2", false]}]
+                          },
+                          {
+                            $and:[{$eq:["$status1", false]},{$eq:["$status2", true]}]
+                          }
+                        ]
+                      },
+                      then:0.5,
+                      else:0
+                    }
+                  }
+                }
+              }
+            },
             total:{$sum:1}
           }
         }
@@ -295,8 +362,7 @@ module.exports = function(app){
           $match:{
             $and:[
               {"stud_id":new ObjectId(req.query.user)},
-              {"date":req.query.date},
-              {"abv":{$not:/LAB.*/}}
+              {"date":req.query.date}
             ]
           }
         }
@@ -308,7 +374,7 @@ module.exports = function(app){
 
     /* Getting daily attendance for lab */
     app.get("/api/get-daily-lab", function(req, res){
-      Attendance.aggregate([
+      AttendanceLab.aggregate([
         {
           $lookup:{
             from:"subjects",
@@ -321,7 +387,8 @@ module.exports = function(app){
           $project:{
             "sub_id":1,
             "stud_id":1,
-            "status":1,
+            "status1":1,
+            "status2":1,
             "date":1,
             "unscheduled":1,
             "abv":"$subjects.abv",
@@ -332,8 +399,7 @@ module.exports = function(app){
           $match:{
             $and:[
               {"stud_id": new ObjectId(req.query.user)},
-              {"date":req.query.date},
-              {"abv":{$regex:"LAB"}}
+              {"date":req.query.date}
             ]
           }
         }
@@ -370,8 +436,7 @@ module.exports = function(app){
           $match:{
             $and:[
               {"stud_id" : new ObjectId(req.query.user)},
-              {"date" : req.query.date},
-              {"abv" : {$not:/LAB.*/}}
+              {"date" : req.query.date}
             ]
           }
         }
@@ -383,7 +448,7 @@ module.exports = function(app){
 
     /* Getting lab attendance to edit */
     app.get("/api/get-edit-lab", function(req, res){
-      Attendance.aggregate([
+      AttendanceLab.aggregate([
         {
           $lookup:{
             from:"subjects",
@@ -397,7 +462,8 @@ module.exports = function(app){
             "_id":1,
             "stud_id":1,
             "sub_id":1,
-            "status":1,
+            "status1":1,
+            "status2":1,
             "unscheduled":1,
             "date":1,
             "abv":"$subjects.abv",
@@ -408,8 +474,7 @@ module.exports = function(app){
           $match:{
             $and:[
               {"stud_id" : new ObjectId(req.query.user)},
-              {"date" : req.query.date},
-              {"abv" : {$regex:"LAB"}}
+              {"date" : req.query.date}
             ]
           }
         }
@@ -448,7 +513,7 @@ module.exports = function(app){
             $and:[
               {"stud_id": new ObjectId(req.query.user)},
               {"sem": {$regex:req.query.sem}},
-              {"abv": {$not:/LAB.*/}}
+              {"unscheduled": false}
             ]
           }
         },
@@ -468,7 +533,7 @@ module.exports = function(app){
 
     /* Getting lab overall */
     app.get("/api/get-overall-lab", function(req, res){
-      Attendance.aggregate([
+      AttendanceLab.aggregate([
         {
           $lookup:{
             from: "subjects",
@@ -482,7 +547,8 @@ module.exports = function(app){
             "_id": 1,
             "stud_id": 1,
             "sub_id": 1,
-            "status": 1,
+            "status1": 1,
+            "status2": 1,
             "unscheduled": 1,
             "date": 1,
             "abv":"$subjects.abv",
@@ -495,7 +561,7 @@ module.exports = function(app){
             $and:[
               {"stud_id":new ObjectId(req.query.user)},
               {"sem":{$regex:req.query.sem}},
-              {"abv": {$regex:"LAB"}}
+              {"unscheduled": false}
             ]
           }
         },
@@ -503,7 +569,35 @@ module.exports = function(app){
           $group:{
             _id:"$sub_id",
             details:{$push:"$$ROOT"},
-            attended:{$sum:{$cond:{if:{$eq:["$status",true]}, then:1, else:0}}},
+            attended:{
+              $sum:{
+                $cond:{
+                  if:{
+                    $and:[
+                      {$eq:["$status1",true]},
+                      {$eq:["$status2",true]}
+                    ]
+                  },
+                  then:1,
+                  else:{
+                    $cond:{
+                      if:{
+                        $or:[
+                          {
+                            $and:[{$eq:["$status1", true]},{$eq:["$status2", false]}]
+                          },
+                          {
+                            $and:[{$eq:["$status1", false]},{$eq:["$status2", true]}]
+                          }
+                        ]
+                      },
+                      then:0.5,
+                      else:0
+                    }
+                  }
+                }
+              }
+            },
             total:{$sum:1}
           }
         }
