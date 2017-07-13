@@ -8,6 +8,10 @@ app.config(['$urlRouterProvider', '$stateProvider', function($urlRouterProvider,
   .state('/mark-attendance',{
     url: '/mark-attendance',
     templateUrl: '../views/user/mark_attendance.html'
+  })
+  .state('/edit-profile',{
+    url: '/edit-profile',
+    templateUrl: '../views/user/edit_profile.html'
   });
 }]);
 

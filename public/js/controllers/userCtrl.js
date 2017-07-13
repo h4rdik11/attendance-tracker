@@ -11,6 +11,7 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
       window.location.href = protocol+"//"+host;
     }
 
+
     $scope.callSnack = function(msg){
       var snackbarContainer = document.querySelector('#demo-toast-example');
       var data = {message: msg};
@@ -43,12 +44,36 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
         if(parseInt(mn)+1 < 10) mn = 0+""+parseInt(parseInt(mn)+1);
         else mn = parseInt(mn);
         var qry_date = yr+"-"+mn;
+        $scope.userDetails = response.data;
 
         var att = [];
-        att = $scope.getAtt(qry_date);
+        att = $scope.getAtt(qry_date, $scope.userDetails.sem);
         $scope.attendance_home = att;
       });
 
+    };
+
+    $scope.setSemEdit = function(val){
+      $scope.userDetails.sem = val;
+    };
+
+    $scope.editDemos = function(){
+      $http.post(protocol+"//"+host+"/api/edit-user-demographics?token="+$auth.getToken(),$scope.userDetails).then(function(response){
+        $scope.initFun();
+        $scope.callSnack(response.data);
+      });
+    };
+
+    $scope.userDetailsPass = {};
+    $scope.changePass = function(){
+      if($scope.userDetailsPass.new_pass !== $scope.userDetailsPass.confirm) $scope.errMsg = "Password do not match.";
+      else {
+        $scope.errMsg = "";
+        $http.post(protocol+"//"+host+"/api/change-password?token="+$auth.getToken()+"&user="+$scope.loggedUser._id, $scope.userDetailsPass).then(function(response){
+          $scope.initFun();
+          $scope.callSnack(response.data);
+        });
+      }
     };
 
     $scope.getSubTheory = function(){
@@ -82,10 +107,10 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
     };
 
 
-    $scope.getAtt = function(date){
+    $scope.getAtt = function(date,sem){
       var att = [];
-      $scope.theory = $http.get(protocol+"//"+host+"/api/get-home-theory?date="+date+"&user="+$scope.loggedUser._id+"&token="+$auth.getToken());
-      $scope.lab = $http.get(protocol+"//"+host+"/api/get-home-lab?date="+date+"&user="+$scope.loggedUser._id+"&token="+$auth.getToken());
+      $scope.theory = $http.get(protocol+"//"+host+"/api/get-home-theory?sem="+sem+"&date="+date+"&user="+$scope.loggedUser._id+"&token="+$auth.getToken());
+      $scope.lab = $http.get(protocol+"//"+host+"/api/get-home-lab?sem="+sem+"&date="+date+"&user="+$scope.loggedUser._id+"&token="+$auth.getToken());
       $q.all([$scope.theory,$scope.lab]).then(function(response){
         for(var i =0; i<response.length; i++){
           var total = 0;

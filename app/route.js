@@ -75,6 +75,27 @@ module.exports = function(app){
     });
   });
 
+  // updating user demographics
+  app.post('/api/edit-user-demographics', function(req, res){
+    User.update({_id: req.body._id}, {$set:{
+      "name": req.body.name,
+      "email": req.body.email,
+      "sem": req.body.sem
+    }}).exec(function(err, result){
+      if(err) res.send("Error : please contact hardik11.chauhan@gmail.com");
+      else res.send("User updated successfully.");
+    });
+  });
+
+  //edit password
+  app.post('/api/change-password', function(req, res){
+    User.update({_id: new ObjectId(req.query.user)}, {$set:{
+      "password": req.body.new_pass
+    }}).exec(function(err, result){
+      if(err) res.send("Error : please contact hardik11.chauhan@gmail.com");
+      else res.send("Password updated successfully.");
+    });
+  });
 
   //adding subjects
   app.post('/api/add-subject', function(req, res){
@@ -169,7 +190,8 @@ module.exports = function(app){
               "unscheduled":1,
               "date":1,
               "abv":"$subjects.abv",
-              "name":"$subjects.name"
+              "name":"$subjects.name",
+              "sem":"$subjects.sem"
             }
           },
           {
@@ -178,6 +200,7 @@ module.exports = function(app){
                 {"stud_id":new ObjectId(req.query.user)},
                 {"unscheduled":false},
                 {"abv":{$not:/LAB.*/}},
+                {"sem": {$regex:req.query.sem}},
                 {"date":{$regex:"^"+req.query.date}}
               ]
             }
@@ -217,7 +240,8 @@ module.exports = function(app){
             "unscheduled":1,
             "date":1,
             "abv":"$subjects.abv",
-            "name":"$subjects.name"
+            "name":"$subjects.name",
+            "sem":"$subjects.sem"
           }
         },
         {
@@ -226,6 +250,7 @@ module.exports = function(app){
               {"stud_id": new ObjectId(req.query.user)},
               {"date":{$regex:"^"+req.query.date}},
               {"unscheduled":false},
+              {"sem": {$regex:req.query.sem}},
               {"abv":{$regex:"LAB"}}
             ]
           }
