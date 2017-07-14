@@ -213,7 +213,6 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
               $http.post(protocol+"//"+host+"/api/mark-attendance-lab?token="+$auth.getToken(), attLab).then(function(res){
                 if(res.data === "success"){
                   $scope.initFun();
-                  $scope.getEditSubjects($scope.user.date);
                   $scope.user.date = "";
                   $scope.marksAttTheory = [];
                   $scope.marksAttLab = [];
@@ -358,7 +357,7 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
     $scope.edit_theory = [];
     $scope.edit_lab = [];
     $scope.getEditSubjects = function(date){
-
+      alert(date);
       var dt = date.split("/");
       date = dt[2]+"-"+dt[1]+"-"+dt[0];
 
