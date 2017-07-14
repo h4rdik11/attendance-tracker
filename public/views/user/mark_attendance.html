@@ -7,7 +7,7 @@
   .card-block #card-text{ font-size: 9px; font-weight: bold;}
   .card-block .head{ padding: 10% }
   .col-xs-3{ padding: 0 1% 0 2%;}
-  #divider{ border-top: 1px solid #9e9e9e; margin-top: 2%}
+  #divider{ border-top: 1px solid #546E7A; margin-top: 2%}
 
   .dash-view{ margin-top: 10%; margin-bottom: 5%}
   .dash-view .dash-head h5{ margin-bottom: 0%; border-bottom: 1px solid #E0E0E0; padding-bottom: 1%}
@@ -26,13 +26,16 @@
 
   .table{ color: white }
   .table{ border-color: #9e9e9e}
-  .table caption{ color: #bdbdbd }
+  .table caption{ color: #0097A7 }
   .table tr td{ border-top-color: #546E7A !important }
+  .table thead{ color: #26C6DA}
 
   a.edit-fresh{ margin-top: 2%; font-size: 13px; color: #00BCD4; text-decoration: none;}
   .edit-fresh .fa { color: #00BCD4 !important }
 
   .btn-link , .btn-link:hover{ color: #00BCD4; text-decoration: none;}
+
+  .submit-btn{ margin-top: 5%}
 
   @media screen and (min-width: 1200px){
 
@@ -128,7 +131,7 @@
         </table>
         <center><button type="button" class="btn btn-link" ng-click=addTheoryLecture()><i class="fa fa-plus" aria-hidden="true"></i>  Add Lecture</button></center>
       </div>
-      <hr class="visible-xs">
+      <hr class="visible-xs" style="border-top: 0.5px solid #546E7A">
       <div class="col-md-6">
         <table class="table">
           <caption><strong>Lab Attendance</strong></caption>
@@ -162,7 +165,7 @@
       </div>
 
     </div>
-    <center><input type="submit" class="btn btn-primary mdl-shadow--2dp" value="SUBMIT"></center>
+    <center><input type="submit" class="btn btn-primary mdl-shadow--2dp submit-btn" value="SUBMIT"></center>
   </form>
 
   <!-- Edit Form -->
@@ -230,7 +233,7 @@
       </div>
 
     </div>
-    <center><input type="submit" class="btn btn-success mdl-shadow--2dp" value="UPDATE"></center>
+    <center><input type="submit" class="btn btn-success mdl-shadow--2dp submit-btn" value="UPDATE"></center>
   </form>
 </div>
 
