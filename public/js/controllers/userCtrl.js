@@ -357,7 +357,6 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
     $scope.edit_theory = [];
     $scope.edit_lab = [];
     $scope.getEditSubjects = function(date){
-      alert(date);
       var dt = date.split("/");
       date = dt[2]+"-"+dt[1]+"-"+dt[0];
 

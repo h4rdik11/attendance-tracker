@@ -417,7 +417,6 @@ module.exports = function(app){
 
     /* Getting Theory attendance to edit */
     app.get("/api/get-edit-theory", function(req, res){
-      console.log(req.query.date);
       Attendance.aggregate([
         {
           $lookup:{
