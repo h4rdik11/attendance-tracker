@@ -7,7 +7,7 @@
   .card-block #card-text{ font-size: 9px; font-weight: bold;}
   .card-block .head{ padding: 10% }
   .col-xs-3{ padding: 0 1% 0 2%;}
-  #divider{ border-top: 1px solid #9e9e9e; margin-top: 2%}
+  #divider{ border-top: 1px solid #546E7A; margin-top: 2%}
 
   .dash-view{ margin-top: 10%}
   .main-view .dash-head h5{ margin-bottom: 0%; padding-bottom: 1%; color: #eeeeee}
@@ -26,8 +26,9 @@
 
   .table{ color: white }
   .table{ border-color: #9e9e9e}
-  .table caption{ color: #bdbdbd }
+  .table caption{ color: #0097A7 }
   .table tr td{ border-top-color: #546E7A !important }
+  .table thead{ color: #26C6DA}
 
   .small-percent{ top:28%; font-size: 12px; margin-left: 18% !important}
 
@@ -100,7 +101,7 @@
 
 <div class="dash-view main-view" ng-show="showMain">
   <div class="dash-head">
-    <center><h5>Attendance For : <strong>{{month}}</strong></h5></center>
+    <center><h5 style="color: #26C6DA">Attendance For : <strong style="color: #fff">{{month}}</strong></h5></center>
   </div>
   <div class="dash-body">
     <div class="row">
@@ -245,7 +246,7 @@
           <tr ng-repeat="th in dailyAttendance[0]">
             <td>{{$index+1}}</td>
             <td><span data-toggle="tooltip" title={{th.sub_name[0]}} data-placement="right">{{th.abv[0]}}</span></td>
-            <td><center><span ng-bind-html=getStatusIcon(th.status,th.unscheduled)></span></center></td>
+            <td><center><span ng-bind-html=getStatusIcon(th.present,th.absent)></span></center></td>
           </tr>
         </tbody>
       </table>
@@ -264,7 +265,7 @@
           <tr ng-repeat="th in dailyAttendance[1]">
             <td>{{$index+1}}</td>
             <td><span data-toggle="tooltip" title={{th.sub_name[0]}} data-placement="right">{{th.abv[0]}}</span></td>
-            <td><center><span ng-bind-html=getStatusIconLab(th.status1,th.status2,th.unscheduled)></span></center></td>
+            <td><center><span ng-bind-html=getStatusIconLab(th.present1,th.present2,th.absent)></span></center></td>
           </tr>
         </tbody>
       </table>
@@ -424,11 +425,11 @@
 
 <div class="dash-view overall-view" ng-show="showOverall">
   <div class="row">
-    <div class="col-xs-3"></div>
-    <div class="col-xs-6">
+    <div class="col-xs-3 col-md-4"></div>
+    <div class="col-xs-12 col-md-4">
       <center>
         <div class="input-group">
-          <input type="text" class="form-control" ng-model="overall_sem" readonly>
+          <input type="text" style="text-align: center" class="form-control" ng-model="overall_sem" readonly>
           <div class="input-group-btn">
             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Sem <span class="caret"></span></button>
             <ul class="dropdown-menu dropdown-menu-right">
@@ -443,7 +444,7 @@
         </div>
       </center>
     </div>
-    <div class="col-xs-3"></div>
+    <div class="col-xs-3 col-md-4"></div>
   </div>
   <div id="divider"></div>
   <div class="row" style="margin-top:5%">

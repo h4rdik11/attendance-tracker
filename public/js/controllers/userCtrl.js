@@ -53,6 +53,47 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
 
     };
 
+    $scope.marksAttTheory = [];
+    $scope.addTheoryLecture = function(){
+      $scope.marksAttTheory.push({
+        "stud_id" : $scope.loggedUser._id,
+        "sub_id" : "",
+        "date"  : $scope.user.date,
+        "present" : false,
+        "absent" : false
+      });
+    };
+
+    $scope.removeRowTheory = function(index){
+      $scope.marksAttTheory.splice(index,1);
+    };
+
+    $scope.setThSub = function(abv, index, sub_id){
+      $scope.marksAttTheory[index].abv = abv;
+      $scope.marksAttTheory[index].sub_id = sub_id;
+    };
+
+    $scope.marksAttLab = [];
+    $scope.addLabLecture = function(){
+      $scope.marksAttLab.push({
+        "stud_id" : $scope.loggedUser._id,
+        "sub_id" : "",
+        "date"  : $scope.user.date,
+        "present1" : false,
+        "present2" : false,
+        "absent" : false
+      });
+    };
+
+    $scope.removeRowLab = function(index){
+      $scope.marksAttLab.splice(index,1);
+    };
+
+    $scope.setThLab = function(abv, index, sub_id){
+      $scope.marksAttLab[index].abv = abv;
+      $scope.marksAttLab[index].sub_id = sub_id;
+    };
+
     $scope.setSemEdit = function(val){
       $scope.userDetails.sem = val;
     };
@@ -79,30 +120,12 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
     $scope.getSubTheory = function(){
       $http.get(protocol+"//"+host+"/api/get-subject-theory?course="+$scope.loggedUser.course+"&sem="+$scope.loggedUser.sem+"&token="+$auth.getToken()).then(function(response){
         $scope.subject_theory = response.data;
-        for(var i = 0; i < $scope.subject_theory.length; i++){
-          $scope.attendance_theory.push({
-            "stud_id" : $scope.loggedUser._id,
-            "sub_id" : $scope.subject_theory[i]._id,
-            "date"  : $scope.user.date,
-            "status" : false,
-            "unscheduled" : false
-          });
-        }
       });
     };
 
     $scope.getSubLab = function(){
       $http.get(protocol+"//"+host+"/api/get-subject-lab?course="+$scope.loggedUser.course+"&sem="+$scope.loggedUser.sem+"&token="+$auth.getToken()).then(function(response){
         $scope.subject_lab = response.data;
-        for(var i = 0; i < $scope.subject_lab.length; i++){
-          $scope.attendance_lab.push({
-            "stud_id" : $scope.loggedUser._id,
-            "sub_id" : $scope.subject_lab[i]._id,
-            "date"  : $scope.user.date,
-            "status" : 0,
-            "unscheduled" : 0
-          });
-        }
       });
     };
 
@@ -137,21 +160,21 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
       });
     };
 
-    $scope.checkUnschduledTheory = function(index){
-      $scope.attendance_theory[index].status = false;
+    $scope.checkAbsentTheory = function(index){
+      $scope.marksAttTheory[index].present = false;
     };
 
-    $scope.checkStatusTheory = function(index,type){
-      $scope.attendance_theory[index].unscheduled = false;
+    $scope.checkPresentTheory = function(index,type){
+      $scope.marksAttTheory[index].absent = false;
     };
 
-    $scope.checkUnschduledLab = function(index){
-      $scope.attendance_lab[index].status1 = false;
-      $scope.attendance_lab[index].status2 = false;
+    $scope.checkAbsentLab = function(index){
+      $scope.marksAttLab[index].present1 = false;
+      $scope.marksAttLab[index].present2 = false;
     };
 
-    $scope.checkStatusLab = function(index){
-        $scope.attendance_lab[index].unscheduled = false;
+    $scope.checkPresentLab = function(index){
+        $scope.marksAttLab[index].absent = false;
     };
 
     $scope.markAttendance = function(){
@@ -163,37 +186,46 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
         else{
           var attTheory = [];
           var attLab = [];
-          for(var i = 0; i<$scope.attendance_theory.length; i++){
-            $scope.attendance_theory[i].date = $scope.user.date;
-            attTheory.push($scope.attendance_theory[i]);
+          for(var i = 0; i<$scope.marksAttTheory.length; i++){
+            //$scope.marksAttTheory[i].date = $scope.user.date;
+            attTheory.push({
+              "stud_id" : $scope.loggedUser._id,
+              "sub_id" : $scope.marksAttTheory[i].sub_id,
+              "date"  : $scope.user.date,
+              "present" : $scope.marksAttTheory[i].present,
+              "absent" : $scope.marksAttTheory[i].absent
+            });
           }
-          for(var i = 0; i<$scope.attendance_lab.length; i++){
-            $scope.attendance_lab[i].date = $scope.user.date;
-            attLab.push($scope.attendance_lab[i]);
+          for(var i = 0; i<$scope.marksAttLab.length; i++){
+            //$scope.marksAttTheory[i].date = $scope.user.date;
+            attLab.push({
+              "stud_id" : $scope.loggedUser._id,
+              "sub_id" : $scope.marksAttLab[i].sub_id,
+              "date"  : $scope.user.date,
+              "present1" : $scope.marksAttLab[i].present1,
+              "present2" : $scope.marksAttLab[i].present2,
+              "absent" : $scope.marksAttLab[i].absent
+            });
           }
 
-          $http.get(protocol+"//"+host+"/api/check-attendance?date="+$scope.user.date+"&user="+$scope.loggedUser._id+"&token="+$auth.getToken()).then(function(response){
-            if(response.data == "exists"){
-              $scope.callSnack("Attendance already marked for the day.");
-            }
-            else{
-              var success = false;
-              $http.post(protocol+"//"+host+"/api/mark-attendance?token="+$auth.getToken(), attTheory).then(function(response){
-                if(response.data === "success"){
-                  $http.post(protocol+"//"+host+"/api/mark-attendance-lab?token="+$auth.getToken(), attLab).then(function(res){
-                    if(res.data === "success"){
-                      $scope.initFun();
-                      $scope.callSnack("Attendance marked successfully.");
-                    }
-                    else{
-                      $scope.callSnack("Error : please contact hardik11.chauhan@gmail.com");
-                    }
-                  });
+          $http.post(protocol+"//"+host+"/api/mark-attendance?token="+$auth.getToken(), attTheory).then(function(response){
+            if(response.data === "success"){
+              $http.post(protocol+"//"+host+"/api/mark-attendance-lab?token="+$auth.getToken(), attLab).then(function(res){
+                if(res.data === "success"){
+                  $scope.initFun();
+                  $scope.getEditSubjects($scope.user.date);
+                  $scope.user.date = "";
+                  $scope.marksAttTheory = [];
+                  $scope.marksAttLab = [];
+                  $scope.callSnack("Attendance marked successfully.");
                 }
                 else{
                   $scope.callSnack("Error : please contact hardik11.chauhan@gmail.com");
                 }
               });
+            }
+            else{
+              $scope.callSnack("Error : please contact hardik11.chauhan@gmail.com");
             }
           });
         }
@@ -241,17 +273,20 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
       //alert(Math.round((attended/total)*100));
       var per = Math.round((attended/total)*100);
       if(per < 75){
-        return "#CC3508";
+        return "#F44336";
       }
       else if(per > 75){
-        return "#4A81CB";
+        return "#26A69A";
       }
       else{
-        return "#DF9308";
+        return "#FF9800";
       }
     };
 
     $scope.getBunk = function(attended, total){
+      if(attended === 0 && total === 0){
+        return "No class conducted this month yet.";
+      }
       if(Math.round((attended/total)*100) > 75){
         var p = Math.round((attended/75)*100);
         var b = p-total;
@@ -279,7 +314,8 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
     };
 
     $scope.getPercent = function(attended, total){
-      return Math.round((attended/total)*100);
+      if(attended === 0 && total === 0) return 0;
+      else return Math.round((attended/total)*100);
     };
 
     $scope.dailyAttendance = [];
@@ -297,20 +333,16 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
       });
     };
 
-    $scope.getStatusIcon = function(status, unscheduled){
-      if(unscheduled === true) return $sce.trustAsHtml('<i data-toggle="tooltip" title="No Class" data-placement="bottom" class="fa fa-ban text-warning" aria-hidden="true" style="color:#d32f2f"></i>');
-      else{
-        if(status === true) return $sce.trustAsHtml('<i data-toggle="tooltip" title="Present" data-placement="bottom" class="fa fa-user" aria-hidden="true" style="color:#4caf50"></i>');
-        else return $sce.trustAsHtml('<i data-toggle="tooltip" title="Absent" data-placement="bottom" class="fa fa-user-o " aria-hidden="true" style="color:#d32f2f"></i>');
-      }
+    $scope.getStatusIcon = function(present, absent){
+      if(absent === true) return $sce.trustAsHtml('<i data-toggle="tooltip" title="Absent" data-placement="bottom" class="fa fa-user-o " aria-hidden="true" style="color:#d32f2f"></i>');
+      if(present === true) return $sce.trustAsHtml('<i data-toggle="tooltip" title="Present" data-placement="bottom" class="fa fa-user" aria-hidden="true" style="color:#4caf50"></i>');
     };
-    $scope.getStatusIconLab = function(status1, status2, unscheduled){
-      if(unscheduled === true) return $sce.trustAsHtml('<i data-toggle="tooltip" title="No Class" data-placement="bottom" class="fa fa-ban text-warning" aria-hidden="true" style="color:#d32f2f"></i>');
+    $scope.getStatusIconLab = function(present1, present2, absent){
+      if(absent === true) return $sce.trustAsHtml('<i data-toggle="tooltip" title="Absent" data-placement="bottom" class="fa fa-user-o " aria-hidden="true" style="color:#d32f2f"></i>&nbsp;&nbsp;<i data-toggle="tooltip" title="Absent" data-placement="bottom" class="fa fa-user-o " aria-hidden="true" style="color:#d32f2f"></i>');
       else{
-        if(status1 === true && status2 === true) return $sce.trustAsHtml('<i data-toggle="tooltip" title="Present" data-placement="bottom" class="fa fa-user" aria-hidden="true" style="color:#4caf50"></i>&nbsp;&nbsp;<i data-toggle="tooltip" title="Present" data-placement="bottom" class="fa fa-user" aria-hidden="true" style="color:#4caf50"></i>');
-        else if(status1 === true && status2 === false) return $sce.trustAsHtml('<i data-toggle="tooltip" title="Present" data-placement="bottom" class="fa fa-user" aria-hidden="true" style="color:#4caf50"></i>&nbsp;&nbsp;<i data-toggle="tooltip" title="Absent" data-placement="bottom" class="fa fa-user-o " aria-hidden="true" style="color:#d32f2f"></i>');
-        else if(status1 === false && status2 === true) return $sce.trustAsHtml('<i data-toggle="tooltip" title="Absent" data-placement="bottom" class="fa fa-user-o " aria-hidden="true" style="color:#d32f2f"></i>&nbsp;&nbsp;<i data-toggle="tooltip" title="Present" data-placement="bottom" class="fa fa-user" aria-hidden="true" style="color:#4caf50"></i>');
-        else return $sce.trustAsHtml('<i data-toggle="tooltip" title="Absent" data-placement="bottom" class="fa fa-user-o " aria-hidden="true" style="color:#d32f2f"></i>&nbsp;&nbsp;<i data-toggle="tooltip" title="Absent" data-placement="bottom" class="fa fa-user-o " aria-hidden="true" style="color:#d32f2f"></i>');
+        if(present1 === true && present2 === true) return $sce.trustAsHtml('<i data-toggle="tooltip" title="Present" data-placement="bottom" class="fa fa-user" aria-hidden="true" style="color:#4caf50"></i>&nbsp;&nbsp;<i data-toggle="tooltip" title="Present" data-placement="bottom" class="fa fa-user" aria-hidden="true" style="color:#4caf50"></i>');
+        else if(present1 === true && present2 === false) return $sce.trustAsHtml('<i data-toggle="tooltip" title="Present" data-placement="bottom" class="fa fa-user" aria-hidden="true" style="color:#4caf50"></i>&nbsp;&nbsp;<i data-toggle="tooltip" title="Absent" data-placement="bottom" class="fa fa-user-o " aria-hidden="true" style="color:#d32f2f"></i>');
+        else if(present1 === false && present2 === true) return $sce.trustAsHtml('<i data-toggle="tooltip" title="Absent" data-placement="bottom" class="fa fa-user-o " aria-hidden="true" style="color:#d32f2f"></i>&nbsp;&nbsp;<i data-toggle="tooltip" title="Present" data-placement="bottom" class="fa fa-user" aria-hidden="true" style="color:#4caf50"></i>');
       }
     };
 
@@ -339,18 +371,18 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
       });
 
       $scope.checkStatusTheoryEdit = function(index){
-        $scope.edit_theory[index].unscheduled = false;
+        $scope.edit_theory[index].absent = false;
       };
       $scope.checkUnschduledTheoryEdit = function(index){
-        $scope.edit_theory[index].status = false;
+        $scope.edit_theory[index].present = false;
       };
 
       $scope.checkStatusLabEdit = function(index){
-        $scope.edit_lab[index].unscheduled = false;
+        $scope.edit_lab[index].absent = false;
       };
       $scope.checkUnschduledLabEdit = function(index){
-        $scope.edit_lab[index].status1 = false;
-        $scope.edit_lab[index].status2 = false;
+        $scope.edit_lab[index].present1 = false;
+        $scope.edit_lab[index].present2 = false;
       };
     };
 
@@ -364,8 +396,8 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
           "_id":$scope.edit_theory[i]._id,
           "stud_id":$scope.edit_theory[i].stud_id,
           "sub_id":$scope.edit_theory[i].sub_id,
-          "status":$scope.edit_theory[i].status,
-          "unscheduled":$scope.edit_theory[i].unscheduled,
+          "present":$scope.edit_theory[i].present,
+          "absent":$scope.edit_theory[i].absent,
           "date":$scope.edit_theory[i].date
         });
       }
@@ -374,9 +406,9 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
           "_id":$scope.edit_lab[i]._id,
           "stud_id":$scope.edit_lab[i].stud_id,
           "sub_id":$scope.edit_lab[i].sub_id,
-          "status1":$scope.edit_lab[i].status1,
-          "status2":$scope.edit_lab[i].status2,
-          "unscheduled":$scope.edit_lab[i].unscheduled,
+          "present1":$scope.edit_lab[i].present1,
+          "present2":$scope.edit_lab[i].present2,
+          "absent":$scope.edit_lab[i].absent,
           "date":$scope.edit_lab[i].date
         });
       }
@@ -396,6 +428,13 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
         else{ $scope.callSnack("Error : contact hardik11.chauhan@gmail.com"); }
       });
     };
+
+    $scope.delTheory = function(id,index){
+      $scope.edit_theory.splice(index,1);
+      $http.get("/api/delete-att-theory?token="+$auth.getToken()+"&user="+$scope.loggedUser._id+"&id="+id).then(function(response){
+        $scope.callSnack(response.data);
+      });
+    }
 
     $scope.getOverall = function(sem){
       $scope.overall_sem = sem;

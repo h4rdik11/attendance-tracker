@@ -5,14 +5,20 @@ app.controller('HomeController', function($scope, $http, $auth, $location){
 
   if($auth.isAuthenticated()) window.location.href = protocol+"//"+host+"/user?token="+$auth.getToken();
 
+  $scope.callSnack = function(msg){
+    var snackbarContainer = document.querySelector('#demo-toast-example');
+    var data = {message: msg};
+    snackbarContainer.MaterialSnackbar.showSnackbar(data);
+  };
+
   $scope.user = {};
   $scope.addUser = function(){
     $auth.signup($scope.user).then(function(response){
       if(response.data.msg == "1"){
         $auth.setToken(response.data.token);
-        alert("User created successfully.");
+        $scope.callSnack("User created successfully.");
       }else{
-        alert("User already exists.");
+        $scope.callSnack("User already exists.");
       }
     });
   };
@@ -26,7 +32,7 @@ app.controller('HomeController', function($scope, $http, $auth, $location){
         window.location.href = protocol+"//"+host+"/user?token="+$auth.getToken();
         // $location.url(protocol+"//"+host+"/user?token="+$auth.getToken());
       }else{
-        alert(response.data.msg);
+        $scope.callSnack(response.data.msg);
       }
     });
   };

@@ -32,6 +32,8 @@
   a.edit-fresh{ margin-top: 2%; font-size: 13px; color: #00BCD4; text-decoration: none;}
   .edit-fresh .fa { color: #00BCD4 !important }
 
+  .btn-link , .btn-link:hover{ color: #00BCD4; text-decoration: none;}
+
   @media screen and (min-width: 1200px){
 
     .main-tabs{ padding: 5% 0 5% 0; border-bottom: 1px solid #E0E0E0; }
@@ -100,39 +102,63 @@
           <caption><strong>Theory Attendance</strong></caption>
           <thead>
             <td><b>#</b></td>
-            <td><b>Subject Name</b></td>
-            <td><center><b>Status</b></center></td>
-            <td><center><b>No Class</b></center></td>
+            <td style="width: 40%"><b>Subject Name</b></td>
+            <td><center><b>Present</b></center></td>
+            <td><center><b>Absent</b></center></td>
           </thead>
           <tbody>
-            <tr ng-repeat="t in subject_theory">
+            <tr ng-repeat="t in marksAttTheory">
               <td>{{$index+1}}</td>
-              <td>{{t.abv}}</td>
-              <td><center><input type="checkbox" ng-model="attendance_theory[$index].status" ng-change=checkStatusTheory($index)></center></td>
-              <td><center><input type="checkbox" ng-model="attendance_theory[$index].unscheduled" ng-change=checkUnschduledTheory($index)></center></td>
+              <td>
+                <div class="input-group">
+                  <input type="text" class="form-control input-sm" ng-model="marksAttTheory[$index].abv">
+                  <div class="input-group-btn">
+                    <button type="button" class="btn btn-default dropdown-toggle btn-sm" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
+                    <ul style="min-width: 115px" class="dropdown-menu dropdown-menu-right">
+                      <li><a href="javascript:void(0)" ng-click=setThSub(th.abv,$parent.$index,th._id) ng-repeat="th in subject_theory">{{th.abv}}</a></li>
+                    </ul>
+                  </div><!-- /btn-group -->
+                </div><!-- /input-group -->
+              </td>
+              <td><center><input type="checkbox" ng-model="marksAttTheory[$index].present" ng-change=checkPresentTheory($index)></center></td>
+              <td><center><input type="checkbox" ng-model="marksAttTheory[$index].absent" ng-change=checkAbsentTheory($index)></center></td>
+              <td><center><a href="javascript:void(0)" ng-click=removeRowTheory($index)><i class="fa fa-trash" aria-hidden="true" style="color: #E53935; font-size: 15px"></i></a></center></td>
             </tr>
           </tbody>
         </table>
+        <center><button type="button" class="btn btn-link" ng-click=addTheoryLecture()><i class="fa fa-plus" aria-hidden="true"></i>  Add Lecture</button></center>
       </div>
-
+      <hr class="visible-xs">
       <div class="col-md-6">
         <table class="table">
           <caption><strong>Lab Attendance</strong></caption>
           <thead>
             <td><b>#</b></td>
-            <td><b>Subject Name</b></td>
-            <td><center><b>Status</b></center></td>
-            <td><center><b>No Class</b></center></td>
+            <td style="width: 40%"><b>Subject Name</b></td>
+            <td><center><b>Present</b></center></td>
+            <td><center><b>Absent</b></center></td>
           </thead>
           <tbody>
-            <tr ng-repeat="l in subject_lab">
+            <tr ng-repeat="l in marksAttLab">
               <td>{{$index+1}}</td>
-              <td>{{l.abv}}</td>
-              <td><center><input type="checkbox" ng-model="attendance_lab[$index].status1" ng-change=checkStatusLab($index)>&nbsp;&nbsp;&nbsp;<input type="checkbox" ng-model="attendance_lab[$index].status2" ng-change=checkStatusLab($index)></center></td>
-              <td><center><input type="checkbox" ng-model="attendance_lab[$index].unscheduled" ng-change=checkUnschduledLab($index)></center></td>
+              <td>
+                <div class="input-group">
+                  <input type="text" class="form-control input-sm" ng-model="marksAttLab[$index].abv">
+                  <div class="input-group-btn">
+                    <button type="button" class="btn btn-default dropdown-toggle btn-sm" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
+                    <ul style="min-width: 115px" class="dropdown-menu dropdown-menu-right">
+                      <li><a href="javascript:void(0)" ng-click=setThLab(th.abv,$parent.$index,th._id) ng-repeat="th in subject_lab">{{th.abv}}</a></li>
+                    </ul>
+                  </div><!-- /btn-group -->
+                </div><!-- /input-group -->
+              </td>
+              <td><center><input type="checkbox" ng-model="marksAttLab[$index].present1" ng-change=checkPresentLab($index)>&nbsp;&nbsp;&nbsp;<input type="checkbox" ng-model="marksAttLab[$index].present2" ng-change=checkPresentLab($index)></center></td>
+              <td><center><input type="checkbox" ng-model="marksAttLab[$index].absent" ng-change=checkAbsentLab($index)></center></td>
+              <td><center><a href="javascript:void(0)" ng-click=removeRowLab($index)><i class="fa fa-trash" aria-hidden="true" style="color: #E53935; font-size: 15px"></i></a></center></td>
             </tr>
           </tbody>
         </table>
+        <center><button type="button" class="btn btn-link" ng-click=addLabLecture()><i class="fa fa-plus" aria-hidden="true"></i>  Add Lecture</button></center>
       </div>
 
     </div>
@@ -167,15 +193,16 @@
           <thead>
             <td><b>#</b></td>
             <td><b>Subject Name</b></td>
-            <td><center><b>Status</b></center></td>
-            <td><center><b>No Class</b></center></td>
+            <td><center><b>Present</b></center></td>
+            <td><center><b>Absent</b></center></td>
           </thead>
           <tbody>
             <tr ng-repeat="t in edit_theory">
               <td>{{$index+1}}</td>
               <td>{{t.abv[0]}}</td>
-              <td><center><input type="checkbox" ng-model=edit_theory[$index].status ng-change=checkStatusTheoryEdit($index)></center></td>
-              <td><center><input type="checkbox" ng-model=edit_theory[$index].unscheduled ng-change=checkUnschduledTheoryEdit($index)></center></td>
+              <td><center><input type="checkbox" ng-model=edit_theory[$index].present ng-change=checkStatusTheoryEdit($index)></center></td>
+              <td><center><input type="checkbox" ng-model=edit_theory[$index].absent ng-change=checkUnschduledTheoryEdit($index)></center></td>
+              <td><center><a href="javascript:void(0)" ng-click=delTheory(t._id,$index)><i class="fa fa-trash" aria-hidden="true" style="color: #E53935; font-size: 15px"></i></a></center></td>
             </tr>
           </tbody>
         </table>
@@ -187,15 +214,16 @@
           <thead>
             <td><b>#</b></td>
             <td><b>Subject Name</b></td>
-            <td><center><b>Status</b></center></td>
-            <td><center><b>No Class</b></center></td>
+            <td><center><b>Present</b></center></td>
+            <td><center><b>Absent</b></center></td>
           </thead>
           <tbody>
             <tr ng-repeat="l in edit_lab">
               <td>{{$index+1}}</td>
               <td>{{l.abv[0]}}</td>
-              <td><center><input type="checkbox" ng-model=edit_lab[$index].status1 ng-change=checkStatusLabEdit($index)>&nbsp;&nbsp;&nbsp;<input type="checkbox" ng-model=edit_lab[$index].status2 ng-change=checkStatusLabEdit($index)></center></td>
-              <td><center><input type="checkbox" ng-model=edit_lab[$index].unscheduled ng-change=checkUnschduledLabEdit($index)></center></td>
+              <td><center><input type="checkbox" ng-model=edit_lab[$index].present1 ng-change=checkStatusLabEdit($index)>&nbsp;&nbsp;&nbsp;<input type="checkbox" ng-model=edit_lab[$index].present2 ng-change=checkStatusLabEdit($index)></center></td>
+              <td><center><input type="checkbox" ng-model=edit_lab[$index].absent ng-change=checkUnschduledLabEdit($index)></center></td>
+              <td><center><a href="javascript:void(0)" ng-click=delLab(t._id,$index)><i class="fa fa-trash" aria-hidden="true" style="color: #E53935; font-size: 15px"></i></a></center></td>
             </tr>
           </tbody>
         </table>

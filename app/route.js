@@ -179,8 +179,8 @@ module.exports = function(app){
         {"_id":new ObjectId(req.body.data[i]._id)},
         {
           $set:{
-            "status":req.body.data[i].status,
-            "unscheduled":req.body.data[i].unscheduled
+            "present":req.body.data[i].present,
+            "absent":req.body.data[i].absent
           }
         },
         function(err, result){
@@ -196,9 +196,9 @@ module.exports = function(app){
         {"_id":new ObjectId(req.body.data[i]._id)},
         {
           $set:{
-            "status1":req.body.data[i].status1,
-            "status2":req.body.data[i].status2,
-            "unscheduled":req.body.data[i].unscheduled
+            "present1":req.body.data[i].present1,
+            "present2":req.body.data[i].present2,
+            "absent":req.body.data[i].absent
           }
         },
         function(err, result){
@@ -206,6 +206,14 @@ module.exports = function(app){
         });
     }
     res.send("success");
+  });
+
+  // deleting theory attendance
+  app.get("/api/delete-att-theory", function(req, res){
+    Attendance.remove({_id:req.query.id}, function(err, result){
+      if(err) res.send("Error : please contact hardik11.chauhan@gmail.com");
+      else res.send("Lecture deleted successfully.");
+    });
   });
 
   //getting attendance
@@ -225,8 +233,8 @@ module.exports = function(app){
             $project:{
               "stud_id":1,
               "sub_id":1,
-              "status":1,
-              "unscheduled":1,
+              "present":1,
+              "absent":1,
               "date":1,
               "abv":"$subjects.abv",
               "name":"$subjects.name",
@@ -237,7 +245,6 @@ module.exports = function(app){
             $match:{
               $and:[
                 {"stud_id":new ObjectId(req.query.user)},
-                {"unscheduled":false},
                 {"abv":{$not:/LAB.*/}},
                 {"sem": {$regex:req.query.sem}},
                 {"date":{$regex:"^"+req.query.date}}
@@ -248,7 +255,7 @@ module.exports = function(app){
             $group:{
               _id: "$sub_id",
               details:{$push:"$$ROOT"},
-              attended:{$sum:{$cond:{if:{$eq:["$status",true]}, then:1, else:0}}},
+              attended:{$sum:{$cond:{if:{$eq:["$present",true]}, then:1, else:0}}},
               total: {$sum:1}
             }
           }
@@ -275,9 +282,9 @@ module.exports = function(app){
           $project:{
             "sub_id":1,
             "stud_id":1,
-            "status1":1,
-            "status2":1,
-            "unscheduled":1,
+            "present1":1,
+            "present2":1,
+            "absent":1,
             "date":1,
             "abv":"$subjects.abv",
             "name":"$subjects.name",
@@ -289,7 +296,6 @@ module.exports = function(app){
             $and:[
               {"stud_id": new ObjectId(req.query.user)},
               {"date":{$regex:"^"+req.query.date}},
-              {"unscheduled":false},
               {"sem": {$regex:req.query.sem}}
             ]
           }
@@ -303,8 +309,8 @@ module.exports = function(app){
                 $cond:{
                   if:{
                     $and:[
-                      {$eq:["$status1",true]},
-                      {$eq:["$status2",true]}
+                      {$eq:["$present1",true]},
+                      {$eq:["$present2",true]}
                     ]
                   },
                   then:1,
@@ -313,10 +319,10 @@ module.exports = function(app){
                       if:{
                         $or:[
                           {
-                            $and:[{$eq:["$status1", true]},{$eq:["$status2", false]}]
+                            $and:[{$eq:["$present1", true]},{$eq:["$present2", false]}]
                           },
                           {
-                            $and:[{$eq:["$status1", false]},{$eq:["$status2", true]}]
+                            $and:[{$eq:["$present1", false]},{$eq:["$present2", true]}]
                           }
                         ]
                       },
@@ -351,8 +357,8 @@ module.exports = function(app){
           $project:{
             "stud_id":1,
             "sub_id":1,
-            "status":1,
-            "unscheduled":1,
+            "present":1,
+            "absent":1,
             "date":1,
             "abv":"$subjects.abv",
             "sub_name":"$subjects.name"
@@ -387,10 +393,10 @@ module.exports = function(app){
           $project:{
             "sub_id":1,
             "stud_id":1,
-            "status1":1,
-            "status2":1,
+            "present1":1,
+            "present2":1,
             "date":1,
-            "unscheduled":1,
+            "absent":1,
             "abv":"$subjects.abv",
             "sub_name":"$subjects.name"
           }
@@ -425,8 +431,8 @@ module.exports = function(app){
             "_id":1,
             "stud_id":1,
             "sub_id":1,
-            "status":1,
-            "unscheduled":1,
+            "present":1,
+            "absent":1,
             "date":1,
             "abv":"$subjects.abv",
             "name":"$subjects.name"
@@ -462,9 +468,9 @@ module.exports = function(app){
             "_id":1,
             "stud_id":1,
             "sub_id":1,
-            "status1":1,
-            "status2":1,
-            "unscheduled":1,
+            "present1":1,
+            "present2":1,
+            "absent":1,
             "date":1,
             "abv":"$subjects.abv",
             "name":"$subjects.name"
@@ -500,8 +506,8 @@ module.exports = function(app){
             "_id": 1,
             "stud_id": 1,
             "sub_id": 1,
-            "status": 1,
-            "unscheduled": 1,
+            "present": 1,
+            "absent": 1,
             "date": 1,
             "abv":"$subjects.abv",
             "name":"$subjects.name",
@@ -512,8 +518,7 @@ module.exports = function(app){
           $match:{
             $and:[
               {"stud_id": new ObjectId(req.query.user)},
-              {"sem": {$regex:req.query.sem}},
-              {"unscheduled": false}
+              {"sem": {$regex:req.query.sem}}
             ]
           }
         },
@@ -521,7 +526,7 @@ module.exports = function(app){
           $group:{
             _id: "$sub_id",
             details:{$push:"$$ROOT"},
-            attended:{$sum:{$cond:{if:{$eq:["$status",true]}, then:1, else:0}}},
+            attended:{$sum:{$cond:{if:{$eq:["$present",true]}, then:1, else:0}}},
             total: {$sum:1}
           }
         }
@@ -547,9 +552,9 @@ module.exports = function(app){
             "_id": 1,
             "stud_id": 1,
             "sub_id": 1,
-            "status1": 1,
-            "status2": 1,
-            "unscheduled": 1,
+            "present1": 1,
+            "present2": 1,
+            "absent": 1,
             "date": 1,
             "abv":"$subjects.abv",
             "name":"$subjects.name",
@@ -560,8 +565,7 @@ module.exports = function(app){
           $match:{
             $and:[
               {"stud_id":new ObjectId(req.query.user)},
-              {"sem":{$regex:req.query.sem}},
-              {"unscheduled": false}
+              {"sem":{$regex:req.query.sem}}
             ]
           }
         },
@@ -574,8 +578,8 @@ module.exports = function(app){
                 $cond:{
                   if:{
                     $and:[
-                      {$eq:["$status1",true]},
-                      {$eq:["$status2",true]}
+                      {$eq:["$present1",true]},
+                      {$eq:["$present2",true]}
                     ]
                   },
                   then:1,
@@ -584,10 +588,10 @@ module.exports = function(app){
                       if:{
                         $or:[
                           {
-                            $and:[{$eq:["$status1", true]},{$eq:["$status2", false]}]
+                            $and:[{$eq:["$present1", true]},{$eq:["$present2", false]}]
                           },
                           {
-                            $and:[{$eq:["$status1", false]},{$eq:["$status2", true]}]
+                            $and:[{$eq:["$present1", false]},{$eq:["$present2", true]}]
                           }
                         ]
                       },
