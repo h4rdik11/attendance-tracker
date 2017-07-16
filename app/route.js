@@ -6,13 +6,20 @@ var jwt = require("jwt-simple");
 var moment = require("moment");
 var config = require("../config/db");
 var mongoose = require("mongoose");
+var firebase = require("firebase");
 var ObjectId = mongoose.Types.ObjectId;
+var fbase = firebase.database();
+
+var subjects = fbase.ref().child("subjects");
+var user = fbase.ref().child("users");
+var attTh = fbase.ref().child("attendancetheory");
+var attLb = fbase.ref().child("attendancelab");
 
 module.exports = function(app){
 
-  /* Frontend route befor authentication */
+  /* Frontend route before authentication */
   app.get('/main', function(req, res){
-      res.sendFile("public/views/index.html", {root: "."});
+    res.sendFile("public/views/index.html", {root: "."});
   });
 
   /* Server Routes */
@@ -20,16 +27,14 @@ module.exports = function(app){
   //authenticate user
   app.post('/api/login', function(req, res){
 
-    User.findOne({$or:[{email : req.body.id},{uname: req.body.id}]}, function(err, user){
-      if(user != null){
-          if(req.body.password == user.password){
-            res.status(200).send({token: createToken(user), msg : "1"});
-          }else{
-            res.send({msg: "Incorrect password."});
-          }
-      }else{
-        res.send({msg: "User id or Email incorrect."});
-      }
+    firebase.auth().signInWithEmailAndPassword(req.body.email, req.body.password).then(function(response){
+      var data = {
+        "_id"   : response.uid,
+        "email" : response.email
+      };
+      res.status(200).send({token: createToken(data), msg : "1"});
+    }).catch(function(err){
+      res.send({msg: err.message});
     });
   });
 
@@ -46,6 +51,22 @@ module.exports = function(app){
           else res.status(200).send({msg:"1"});
         });
       }
+    });
+  });
+
+  /* Fire Base Routes */
+  app.post('/api/register', function(req, res){
+    firebase.auth().createUserWithEmailAndPassword(req.body.email,req.body.password).then(function(response){
+      var data = {
+        "name": req.body.name,
+        "sem" : req.body.sem,
+        "course": "",
+        "college": ""
+      };
+      user.child(response.uid).set(data);
+      res.send("User Created successfully.");
+    }).catch(function(err){
+      res.send(err.message);
     });
   });
 
@@ -67,12 +88,13 @@ module.exports = function(app){
 
   //getting user
   app.get('/api/get-user', function(req, res){
-    User.findOne({_id: req.decoded.sub,}).select('-password').exec(function(err, user){
-      if(err){
-        res.send("Cannot find the user.");
-      }else{
-        res.json(user);
-      }
+    user.orderByKey().equalTo(req.decoded.sub).on('child_added', function(snap){
+      var data = {
+        "_id" : req.decoded.sub,
+        "name": snap.val().name,
+        "sem" : snap.val().sem
+      };
+      res.json(data);
     });
   });
 
@@ -109,14 +131,14 @@ module.exports = function(app){
 
   //getting subjects(theory)
   app.get('/api/get-subject-theory', function(req, res){
-    Subject.find({"course" : "MCA", "sem" : req.query.sem, "abv" : {$not:/LAB.*/}}, function(err, result){
-      if(err){
-        res.send("No subject found");
-      }else{
-        res.json(result);
-      }
+    subjects.orderByChild('sem_type').equalTo(req.query.sem+"_th").on('value', function(snap){
+      var data = [];
+      console.log(data);
+      data.push(snap.val());
     });
+    res.json(data);
   });
+
   //getting subjects (Lab)
   app.get('/api/get-subject-lab',function(req, res){
     Subject.find({"course" : "MCA", "sem" : req.query.sem, "abv": {$regex:"LAB"}}, function(err, result){
@@ -142,17 +164,21 @@ module.exports = function(app){
       }
     });
   });
+
   app.post('/api/mark-attendance', function(req, res){
-    var success = false;
+    console.log(req.body);
     for(var i =0; i< req.body.length; i++){
-      var success = false;
       var dt = req.body[i].date.split("/");
       var date = dt[2]+"-"+dt[1]+"-"+dt[0];
       req.body[i].date = date;
-      var a = new Attendance(req.body[i]);
-      a.save(function(err, pass){
-        if(err) res.send("Error : Contact hardik11.chauhan@gmail.com");
-      });
+      var data = {
+        "sub_name"  : req.body[i].sub_name,
+        "sub_abv"  : req.body[i].sub_abv,
+        "present"  : req.body[i].present,
+        "absent"  : req.body[i].absent
+      };
+      console.log(data);
+      attTh.child(req.body[i].stud_id).child(req.body[i].sem).child(dt[2]).child(dt[1]).child(dt[0]).push(data);
     }
     res.send("success");
   });
@@ -163,9 +189,12 @@ module.exports = function(app){
       var dt = req.body[i].date.split("/");
       var date = dt[2]+"-"+dt[1]+"-"+dt[0];
       req.body[i].date = date;
-      var a = new AttendanceLab(req.body[i]);
-      a.save(function(err, pass){
-        if(err) res.send("Error : Contact hardik11.chauhan@gmail.com");
+      attLb.child(req.body[i].stud_id).child(req.body[i].sem).child(dt[2]).child(dt[1]).child(dt[0]).push({
+        "sub_name"  : req.body[i].sub_name,
+        "sub_abv"  : req.body[i].sub_abv,
+        "present1"  : req.body[i].present1,
+        "present2"  : req.body[i].present2,
+        "absent"  : req.body[i].absent
       });
     }
     res.send("success");
@@ -174,45 +203,48 @@ module.exports = function(app){
   //update attendance
   app.post("/api/update-attendance", function(req, res){
     var success = true;
+    console.log(req.body.data[0].$id);
     for(var i = 0; i<req.body.data.length; i++){
-      Attendance.update(
-        {"_id":new ObjectId(req.body.data[i]._id)},
-        {
-          $set:{
-            "present":req.body.data[i].present,
-            "absent":req.body.data[i].absent
-          }
-        },
-        function(err, result){
-          if(err) res.send("error");;
-        });
+      var dt = req.body.date.split("-");
+      attTh.child(req.body.stud_id).child(req.body.sem).child(dt[0]).child(dt[1]).child(dt[2]).child(req.body.data[i].$id).set({
+        "sub_name"  : req.body.data[i].sub_name,
+        "sub_abv"  : req.body.data[i].sub_abv,
+        "present" : req.body.data[i].present,
+        "absent"  : req.body.data[i].absent
+      });
     }
     res.send("success");
   });
   app.post("/api/update-attendance-lab", function(req, res){
     var success = true;
     for(var i = 0; i<req.body.data.length; i++){
-      AttendanceLab.update(
-        {"_id":new ObjectId(req.body.data[i]._id)},
-        {
-          $set:{
-            "present1":req.body.data[i].present1,
-            "present2":req.body.data[i].present2,
-            "absent":req.body.data[i].absent
-          }
-        },
-        function(err, result){
-          if(err) res.send("error");;
-        });
+      var dt = req.body.date.split("-");
+      attLb.child(req.body.stud_id).child(req.body.sem).child(dt[0]).child(dt[1]).child(dt[2]).child(req.body.data[i].$id).set({
+        "sub_name"  : req.body.data[i].sub_name,
+        "sub_abv"  : req.body.data[i].sub_abv,
+        "present1"  : req.body.data[i].present1,
+        "present2"  : req.body.data[i].present2,
+        "absent"  : req.body.data[i].absent
+      });
     }
     res.send("success");
   });
 
   // deleting theory attendance
-  app.get("/api/delete-att-theory", function(req, res){
-    Attendance.remove({_id:req.query.id}, function(err, result){
+  app.post("/api/delete-att-theory", function(req, res){
+    var dt = req.body.date.split("-");
+    attTh.child(req.body.stud).child(req.body.sem).child(dt[0]).child(dt[1]).child(dt[2]).child(req.body.id).remove(function(err){
       if(err) res.send("Error : please contact hardik11.chauhan@gmail.com");
       else res.send("Lecture deleted successfully.");
+    })
+  });
+
+  // deleting lab attendance
+  app.post("/api/delete-att-lab", function(req, res){
+    var dt = req.body.date.split("-");
+    attLb.child(req.body.stud).child(req.body.sem).child(dt[0]).child(dt[1]).child(dt[2]).child(req.body.id).remove(function(err){
+      if(err) res.send("Error : please contact hardik11.chauhan@gmail.com");
+      else res.send("Lab deleted successfully.");
     });
   });
 
@@ -613,7 +645,6 @@ module.exports = function(app){
 
   /* Frontend Routes */
   app.get('/user', function(req,res){
-    // res.send(__dirname);
     res.sendFile("public/views/user/index.html", { root: "." });
   });
 

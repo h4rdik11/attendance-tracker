@@ -118,9 +118,9 @@
             <td><center><b>Total</b></center></td>
           </thead>
           <tbody>
-            <tr ng-repeat="t in attendance_home[0].att">
+            <tr ng-repeat="t in attendance_home[0].data">
               <td>{{$index+1}}</td>
-              <td>{{t.details[0].abv[0]}}</td>
+              <td>{{t.abv}}</td>
               <td><center>{{t.attended}}</center></td>
               <td><center>{{t.total}}</center></td>
             </tr>
@@ -138,9 +138,9 @@
             <td><center><b>Total</b></center></td>
           </thead>
           <tbody>
-            <tr ng-repeat="l in attendance_home[1].att">
+            <tr ng-repeat="l in attendance_home[1].data">
               <td>{{$index+1}}</td>
-              <td>{{l.details[0].abv[0]}}</td>
+              <td>{{l.abv}}</td>
               <td><center>{{l.attended}}</center></td>
               <td><center>{{l.total}}</center></td>
             </tr>
@@ -358,9 +358,9 @@
           <td><center><b>Total</b></center></td>
         </thead>
         <tbody>
-          <tr ng-repeat="th in attendance_monthly[0].att">
+          <tr ng-repeat="th in attendance_monthly[0].data">
             <td>{{$index+1}}</td>
-            <td><span data-toggle="tooltip" title={{th.details[0].name[0]}} data-placement="right">{{th.details[0].abv[0]}}</span></td>
+            <td><span data-toggle="tooltip" title={{th.name}} data-placement="right">{{th.abv}}</span></td>
             <td><center>{{th.attended}}</center></td>
             <td><center>{{th.total}}</center></td>
           </tr>
@@ -410,9 +410,9 @@
           <td><center><b>Total</b></center></td>
         </thead>
         <tbody>
-          <tr ng-repeat="th in attendance_monthly[1].att">
+          <tr ng-repeat="th in attendance_monthly[1].data">
             <td>{{$index+1}}</td>
-            <td><span data-toggle="tooltip" title={{th.details[0].name[0]}} data-placement="right">{{th.details[0].abv[0]}}</span></td>
+            <td><span data-toggle="tooltip" title={{th.name}} data-placement="right">{{th.abv}}</span></td>
             <td><center>{{th.attended}}</center></td>
             <td><center>{{th.total}}</center></td>
           </tr>

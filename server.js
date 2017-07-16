@@ -3,11 +3,14 @@ var express = require("express");
 var app = express();
 var bodyParser = require("body-parser");
 var cors = require("cors");
+var firebase = require("firebase");
 var mongoose = require("mongoose");
 
 /* Configurations */
 var db = require("./config/db");
 var port = Number(process.env.PORT || 5000);
+firebase.initializeApp(db.firebase);
+
 mongoose.connect(db.url, function(err, db){
   if(!err){
     console.log("Connection to database established.");

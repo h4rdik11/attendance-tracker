@@ -114,11 +114,11 @@
               <td>{{$index+1}}</td>
               <td>
                 <div class="input-group">
-                  <input type="text" class="form-control input-sm" ng-model="marksAttTheory[$index].abv">
+                  <input type="text" class="form-control input-sm" ng-model="marksAttTheory[$index].sub_abv">
                   <div class="input-group-btn">
                     <button type="button" class="btn btn-default dropdown-toggle btn-sm" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
                     <ul style="min-width: 115px" class="dropdown-menu dropdown-menu-right">
-                      <li><a href="javascript:void(0)" ng-click=setThSub(th.abv,$parent.$index,th._id) ng-repeat="th in subject_theory">{{th.abv}}</a></li>
+                      <li><a href="javascript:void(0)" ng-click=setThSub(th.abv,$parent.$index,th.name) ng-repeat="th in subject_theory">{{th.abv}}</a></li>
                     </ul>
                   </div><!-- /btn-group -->
                 </div><!-- /input-group -->
@@ -146,11 +146,11 @@
               <td>{{$index+1}}</td>
               <td>
                 <div class="input-group">
-                  <input type="text" class="form-control input-sm" ng-model="marksAttLab[$index].abv">
+                  <input type="text" class="form-control input-sm" ng-model="marksAttLab[$index].sub_abv">
                   <div class="input-group-btn">
                     <button type="button" class="btn btn-default dropdown-toggle btn-sm" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
                     <ul style="min-width: 115px" class="dropdown-menu dropdown-menu-right">
-                      <li><a href="javascript:void(0)" ng-click=setThLab(th.abv,$parent.$index,th._id) ng-repeat="th in subject_lab">{{th.abv}}</a></li>
+                      <li><a href="javascript:void(0)" ng-click=setThLab(th.abv,$parent.$index,th.name) ng-repeat="th in subject_lab">{{th.abv}}</a></li>
                     </ul>
                   </div><!-- /btn-group -->
                 </div><!-- /input-group -->
@@ -202,10 +202,10 @@
           <tbody>
             <tr ng-repeat="t in edit_theory">
               <td>{{$index+1}}</td>
-              <td>{{t.abv[0]}}</td>
+              <td>{{t.sub_abv}}</td>
               <td><center><input type="checkbox" ng-model=edit_theory[$index].present ng-change=checkStatusTheoryEdit($index)></center></td>
               <td><center><input type="checkbox" ng-model=edit_theory[$index].absent ng-change=checkUnschduledTheoryEdit($index)></center></td>
-              <td><center><a href="javascript:void(0)" ng-click=delTheory(t._id,$index)><i class="fa fa-trash" aria-hidden="true" style="color: #E53935; font-size: 15px"></i></a></center></td>
+              <td><center><a href="javascript:void(0)" ng-click=delTheory(t.$id)><i class="fa fa-trash" aria-hidden="true" style="color: #E53935; font-size: 15px"></i></a></center></td>
             </tr>
           </tbody>
         </table>
@@ -223,10 +223,10 @@
           <tbody>
             <tr ng-repeat="l in edit_lab">
               <td>{{$index+1}}</td>
-              <td>{{l.abv[0]}}</td>
+              <td>{{l.sub_abv}}</td>
               <td><center><input type="checkbox" ng-model=edit_lab[$index].present1 ng-change=checkStatusLabEdit($index)>&nbsp;&nbsp;&nbsp;<input type="checkbox" ng-model=edit_lab[$index].present2 ng-change=checkStatusLabEdit($index)></center></td>
               <td><center><input type="checkbox" ng-model=edit_lab[$index].absent ng-change=checkUnschduledLabEdit($index)></center></td>
-              <td><center><a href="javascript:void(0)" ng-click=delLab(t._id,$index)><i class="fa fa-trash" aria-hidden="true" style="color: #E53935; font-size: 15px"></i></a></center></td>
+              <td><center><a href="javascript:void(0)" ng-click=delLab(l.$id)><i class="fa fa-trash" aria-hidden="true" style="color: #E53935; font-size: 15px"></i></a></center></td>
             </tr>
           </tbody>
         </table>

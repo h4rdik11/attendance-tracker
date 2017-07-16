@@ -14,12 +14,7 @@ app.controller('HomeController', function($scope, $http, $auth, $location){
   $scope.user = {};
   $scope.addUser = function(){
     $auth.signup($scope.user).then(function(response){
-      if(response.data.msg == "1"){
-        $auth.setToken(response.data.token);
-        $scope.callSnack("User created successfully.");
-      }else{
-        $scope.callSnack("User already exists.");
-      }
+      $scope.callSnack("User created successfully.");
     });
   };
 

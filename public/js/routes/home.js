@@ -17,7 +17,7 @@ app.config(['$authProvider', function($authProvider){
   var host = location.host;
   var protocol = location.protocol;
 
-  $authProvider.signupUrl = protocol+"//"+host+"/api/add-user";
+  $authProvider.signupUrl = protocol+"//"+host+"/api/register";
   $authProvider.loginUrl = protocol+"//"+host+"/api/login";
   $authProvider.google({
     clientId: 'Google Client ID'

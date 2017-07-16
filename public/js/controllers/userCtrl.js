@@ -1,7 +1,9 @@
-app.controller('UserController', function($scope, $http, $auth, $location, $q, $sce){
+app.controller('UserController', function($scope, $http, $auth, $location, $q, $sce, $firebaseObject, $firebaseArray){
 
     var host = location.host;
     var protocol = location.protocol;
+    var firedb = firebase.database().ref();
+
     $scope.Math = window.Math;
 
     if(! $auth.isAuthenticated()) window.location.href = protocol+"//"+host;
@@ -30,34 +32,47 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
     $scope.attendance_home = [];
 
     $scope.hello = null;
+
+    //$firebaseArray(firedb.child("attendancetheory").child(stud).child(sem).child(yr).child(mn)).on('value', function(){});
+
     $scope.initFun = function(){
 
       //getting user info
       $http.get(protocol+"//"+host+"/api/get-user?token="+$auth.getToken()).then(function(response){
+
         $scope.loggedUser = response.data;
-        $scope.getSubTheory();
-        $scope.getSubLab();
+
         //getting attendance for home screen
         var d = new Date();
         var yr = d.getFullYear();
         var mn = d.getMonth();
-        if(parseInt(mn)+1 < 10) mn = 0+""+parseInt(parseInt(mn)+1);
+        var dd = d.getDate();
+
+        if(parseInt(mn)+1 < 10) mn = "0"+""+parseInt(parseInt(mn)+1);
         else mn = parseInt(mn);
+
+        if(parseInt(dd)+1 < 10) dd = "0"+""+parseInt(parseInt(dd));
+        else dd = parseInt(dd);
+
         var qry_date = yr+"-"+mn;
-        $scope.userDetails = response.data;
-
         var att = [];
-        att = $scope.getAtt(qry_date, $scope.userDetails.sem);
-        $scope.attendance_home = att;
-      });
+        att = $scope.getAtt(yr, mn, $scope.loggedUser.sem, $scope.loggedUser._id);
 
+        $scope.attendance_home = att;
+        console.log(att);
+
+        $scope.subject_theory = $firebaseArray(firedb.child('subjects').orderByChild('sem_type').equalTo($scope.loggedUser.sem+"_th"));
+        $scope.subject_lab = $firebaseArray(firedb.child('subjects').orderByChild('sem_type').equalTo($scope.loggedUser.sem+"_lb"));
+      });
     };
+
 
     $scope.marksAttTheory = [];
     $scope.addTheoryLecture = function(){
       $scope.marksAttTheory.push({
         "stud_id" : $scope.loggedUser._id,
-        "sub_id" : "",
+        "sub_abv":"",
+        "sub_name":"",
         "date"  : $scope.user.date,
         "present" : false,
         "absent" : false
@@ -68,16 +83,17 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
       $scope.marksAttTheory.splice(index,1);
     };
 
-    $scope.setThSub = function(abv, index, sub_id){
-      $scope.marksAttTheory[index].abv = abv;
-      $scope.marksAttTheory[index].sub_id = sub_id;
+    $scope.setThSub = function(abv, index, name){
+      $scope.marksAttTheory[index].sub_abv = abv;
+      $scope.marksAttTheory[index].sub_name = name;
     };
 
     $scope.marksAttLab = [];
     $scope.addLabLecture = function(){
       $scope.marksAttLab.push({
         "stud_id" : $scope.loggedUser._id,
-        "sub_id" : "",
+        "sub_abv" : "",
+        "sub_name" : "",
         "date"  : $scope.user.date,
         "present1" : false,
         "present2" : false,
@@ -89,9 +105,9 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
       $scope.marksAttLab.splice(index,1);
     };
 
-    $scope.setThLab = function(abv, index, sub_id){
-      $scope.marksAttLab[index].abv = abv;
-      $scope.marksAttLab[index].sub_id = sub_id;
+    $scope.setThLab = function(abv, index, name){
+      $scope.marksAttLab[index].sub_abv = abv;
+      $scope.marksAttLab[index].sub_name = name;
     };
 
     $scope.setSemEdit = function(val){
@@ -117,40 +133,101 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
       }
     };
 
-    $scope.getSubTheory = function(){
-      $http.get(protocol+"//"+host+"/api/get-subject-theory?course="+$scope.loggedUser.course+"&sem="+$scope.loggedUser.sem+"&token="+$auth.getToken()).then(function(response){
-        $scope.subject_theory = response.data;
-      });
-    };
-
-    $scope.getSubLab = function(){
-      $http.get(protocol+"//"+host+"/api/get-subject-lab?course="+$scope.loggedUser.course+"&sem="+$scope.loggedUser.sem+"&token="+$auth.getToken()).then(function(response){
-        $scope.subject_lab = response.data;
-      });
-    };
-
-
-    $scope.getAtt = function(date,sem){
+    $scope.getAtt = function(yr,mn,sem,stud){
       var att = [];
-      $scope.theory = $http.get(protocol+"//"+host+"/api/get-home-theory?sem="+sem+"&date="+date+"&user="+$scope.loggedUser._id+"&token="+$auth.getToken());
-      $scope.lab = $http.get(protocol+"//"+host+"/api/get-home-lab?sem="+sem+"&date="+date+"&user="+$scope.loggedUser._id+"&token="+$auth.getToken());
-      $q.all([$scope.theory,$scope.lab]).then(function(response){
-        for(var i =0; i<response.length; i++){
-          var total = 0;
-          var attended = 0;
-          for(var j = 0; j<response[i].data.length; j++){
-            total += response[i].data[j].total;
-            attended += response[i].data[j].attended;
+
+      // Getting Theory
+      $scope.theory = $firebaseArray(firedb.child("attendancetheory").child(stud).child(sem).child(yr).child(mn));
+
+      console.log($scope.theory);
+      // Finding attended and total classes for every subject
+      var sub_th = [];
+      for(var i=0; i<$scope.subject_theory.length; i++){
+        var sub_ob = {
+          "name" : "",
+          "abv" : "",
+          "attended" : 0,
+          "total" : 0
+        };
+        sub_ob.name = $scope.subject_theory[i].name;
+        sub_ob.abv = $scope.subject_theory[i].abv;
+        for(var j = 0; j<$scope.theory.length; j++){
+          for(item in result.$getRecord(result.$keyAt(j))){
+            if(item == "$id" || item == "$priority") continue;
+            if(result.$getRecord($scope.theory.$keyAt(j))[item].sub_abv === $scope.subject_theory[i].abv){
+              sub_ob.attended += ($scope.theory.$getRecord($scope.theory.$keyAt(j))[item].present)?1:0;
+              sub_ob.total += 1;
+            }
           }
-          var data = {
-            "att": response[i].data,
-            "attended": attended,
-            "total": total
-          };
-          att.push(data);
         }
-        $scope.progress = false;
+        sub_th.push(sub_ob);
+      }
+
+      // Finding attended and total classes for all subjects
+      var attended = 0;
+      var total = 0;
+      for(var i=0; i<$scope.theory.length; i++){
+        for(item in $scope.theory.$getRecord($scope.theory.$keyAt(i))){
+          if(item == "$id" || item == "$priority") continue;
+          attended += ($scope.theory.$getRecord($scope.theory.$keyAt(i))[item].present)?1:0;
+          total += 1;
+        }
+      }
+      console.log(attended+"/"+total);
+      att.push({
+        "data" : sub_th,
+        "attended": attended,
+        "total": total
       });
+      // $scope.theory.$loaded(function(result){
+      //
+      // });
+
+      // Getting lab
+      $scope.lab = $firebaseArray(firedb.child("attendancelab").child(stud).child(sem).child(yr).child(mn));
+      $scope.lab.$loaded(function(result){
+
+        // Finding attended and total classes for every subject
+        var sub_lb = [];
+        for(var i=0; i<$scope.subject_lab.length; i++){
+          var sub_ob = {
+            "name" : "",
+            "abv" : "",
+            "attended" : 0,
+            "total" : 0
+          };
+          sub_ob.name = $scope.subject_lab[i].name;
+          sub_ob.abv = $scope.subject_lab[i].abv;
+          for(var j = 0; j<result.length; j++){
+            for(item in result.$getRecord(result.$keyAt(j))){
+                if(item == "$id" || item == "$priority") continue;
+                if(result.$getRecord(result.$keyAt(j))[item].sub_abv === $scope.subject_lab[i].abv){
+                  sub_ob.attended += (result.$getRecord(result.$keyAt(j))[item].present1)?0.5:0 + (result.$getRecord(result.$keyAt(j))[item].present2)?0.5:0;
+                  sub_ob.total += 1;
+                }
+            }
+          }
+          sub_lb.push(sub_ob);
+        }
+
+        // Finding attended and total classes for all subjects
+        var attended = 0;
+        var total = 0;
+        for(var i=0; i<result.length; i++){
+          for(item in result.$getRecord(result.$keyAt(i))){
+            if(item == "$id" || item == "$priority") continue;
+            attended += (result.$getRecord(result.$keyAt(i))[item].present1)?0.5:0 + (result.$getRecord(result.$keyAt(i))[item].present2)?0.5:0;
+            total += 1;
+          }
+        }
+        console.log(attended+"/"+total);
+        att.push({
+          "data" : sub_lb,
+          "attended": attended,
+          "total": total
+        });
+      });
+
       return att;
     };
 
@@ -190,7 +267,9 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
             //$scope.marksAttTheory[i].date = $scope.user.date;
             attTheory.push({
               "stud_id" : $scope.loggedUser._id,
-              "sub_id" : $scope.marksAttTheory[i].sub_id,
+              "sem" : $scope.loggedUser.sem,
+              "sub_abv" : $scope.marksAttTheory[i].sub_abv,
+              "sub_name" : $scope.marksAttTheory[i].sub_name,
               "date"  : $scope.user.date,
               "present" : $scope.marksAttTheory[i].present,
               "absent" : $scope.marksAttTheory[i].absent
@@ -200,7 +279,9 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
             //$scope.marksAttTheory[i].date = $scope.user.date;
             attLab.push({
               "stud_id" : $scope.loggedUser._id,
-              "sub_id" : $scope.marksAttLab[i].sub_id,
+              "sem" : $scope.loggedUser.sem,
+              "sub_abv" : $scope.marksAttLab[i].sub_abv,
+              "sub_name" : $scope.marksAttLab[i].sub_name,
               "date"  : $scope.user.date,
               "present1" : $scope.marksAttLab[i].present1,
               "present2" : $scope.marksAttLab[i].present2,
@@ -212,10 +293,10 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
             if(response.data === "success"){
               $http.post(protocol+"//"+host+"/api/mark-attendance-lab?token="+$auth.getToken(), attLab).then(function(res){
                 if(res.data === "success"){
-                  $scope.initFun();
                   $scope.user.date = "";
                   $scope.marksAttTheory = [];
                   $scope.marksAttLab = [];
+                  $scope.initFun();
                   $scope.callSnack("Attendance marked successfully.");
                 }
                 else{
@@ -309,7 +390,8 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
       $scope.month_name = $scope.month_arr[m-1];
       var year = new Date().getFullYear();
       var date = year+"-"+month;
-      $scope.attendance_monthly = $scope.getAtt(date, $scope.userDetails.sem);
+      $scope.attendance_monthly = $scope.getAtt(year, month, $scope.loggedUser.sem, $scope.loggedUser._id);
+      $scope.progress = false;
     };
 
     $scope.getPercent = function(attended, total){
@@ -360,13 +442,10 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
       var dt = date.split("/");
       date = dt[2]+"-"+dt[1]+"-"+dt[0];
 
-      var q1 = $http.get(protocol+"//"+host+"/api/get-edit-theory?date="+date+"&user="+$scope.loggedUser._id+"&token="+$auth.getToken());
-      var q2 = $http.get(protocol+"//"+host+"/api/get-edit-lab?date="+date+"&user="+$scope.loggedUser._id+"&token="+$auth.getToken());
+      $scope.edit_theory = $firebaseArray(firedb.child('attendancetheory').child($scope.loggedUser._id).child($scope.loggedUser.sem).child(dt[2]).child(dt[1]).child(dt[0]));
+      $scope.edit_lab = $firebaseArray(firedb.child('attendancelab').child($scope.loggedUser._id).child($scope.loggedUser.sem).child(dt[2]).child(dt[1]).child(dt[0]));
 
-      $q.all([q1, q2]).then(function(response){
-        $scope.edit_theory = response[0].data;
-        $scope.edit_lab = response[1].data;
-      });
+      console.log($scope.edit_theory);
 
       $scope.checkStatusTheoryEdit = function(index){
         $scope.edit_theory[index].absent = false;
@@ -387,35 +466,18 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
     $scope.updateAttendance = function(){
       var dt = $scope.user.edit_date.split("/");
       date = dt[2]+"-"+dt[1]+"-"+dt[0];
-      var dataTheory = [];
-      var dataLab = [];
-      for(var i = 0; i<$scope.edit_theory.length; i++){
-        dataTheory.push({
-          "_id":$scope.edit_theory[i]._id,
-          "stud_id":$scope.edit_theory[i].stud_id,
-          "sub_id":$scope.edit_theory[i].sub_id,
-          "present":$scope.edit_theory[i].present,
-          "absent":$scope.edit_theory[i].absent,
-          "date":$scope.edit_theory[i].date
-        });
-      }
-      for(var i = 0; i<$scope.edit_lab.length; i++){
-        dataLab.push({
-          "_id":$scope.edit_lab[i]._id,
-          "stud_id":$scope.edit_lab[i].stud_id,
-          "sub_id":$scope.edit_lab[i].sub_id,
-          "present1":$scope.edit_lab[i].present1,
-          "present2":$scope.edit_lab[i].present2,
-          "absent":$scope.edit_lab[i].absent,
-          "date":$scope.edit_lab[i].date
-        });
-      }
       $http.post("/api/update-attendance?token="+$auth.getToken(), {
-        "data" : dataTheory
+        "data" : $scope.edit_theory,
+        "date" : date,
+        "stud_id": $scope.loggedUser._id,
+        "sem": $scope.loggedUser.sem
       }).then(function(response){
         if(response.data === "success"){
           $http.post("/api/update-attendance-lab?token="+$auth.getToken(), {
-            "data" : dataLab
+            "data" : $scope.edit_lab,
+            "date" : date,
+            "stud_id": $scope.loggedUser._id,
+            "sem": $scope.loggedUser.sem
           }).then(function(res){
             if(res.data === "success"){
               $scope.initFun();
@@ -427,9 +489,28 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
       });
     };
 
-    $scope.delTheory = function(id,index){
-      $scope.edit_theory.splice(index,1);
-      $http.get("/api/delete-att-theory?token="+$auth.getToken()+"&user="+$scope.loggedUser._id+"&id="+id).then(function(response){
+    $scope.delTheory = function(id){
+      var dt = $scope.user.edit_date.split("/");
+      date = dt[2]+"-"+dt[1]+"-"+dt[0];
+      $http.post("/api/delete-att-theory?token="+$auth.getToken(), {
+        "stud" : $scope.loggedUser._id,
+        "sem"  : $scope.loggedUser.sem,
+        "date" : date,
+        "id"   : id
+      }).then(function(response){
+        $scope.callSnack(response.data);
+      });
+    }
+
+    $scope.delLab = function(id){
+      var dt = $scope.user.edit_date.split("/");
+      date = dt[2]+"-"+dt[1]+"-"+dt[0];
+      $http.post("/api/delete-att-lab?token="+$auth.getToken(), {
+        "stud" : $scope.loggedUser._id,
+        "sem"  : $scope.loggedUser.sem,
+        "date" : date,
+        "id"   : id
+      }).then(function(response){
         $scope.callSnack(response.data);
       });
     }
