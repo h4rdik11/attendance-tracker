@@ -226,7 +226,7 @@
               <td>{{l.abv[0]}}</td>
               <td><center><input type="checkbox" ng-model=edit_lab[$index].present1 ng-change=checkStatusLabEdit($index)>&nbsp;&nbsp;&nbsp;<input type="checkbox" ng-model=edit_lab[$index].present2 ng-change=checkStatusLabEdit($index)></center></td>
               <td><center><input type="checkbox" ng-model=edit_lab[$index].absent ng-change=checkUnschduledLabEdit($index)></center></td>
-              <td><center><a href="javascript:void(0)" ng-click=delLab(t._id,$index)><i class="fa fa-trash" aria-hidden="true" style="color: #E53935; font-size: 15px"></i></a></center></td>
+              <td><center><a href="javascript:void(0)" ng-click=delLab(l._id,$index)><i class="fa fa-trash" aria-hidden="true" style="color: #E53935; font-size: 15px"></i></a></center></td>
             </tr>
           </tbody>
         </table>

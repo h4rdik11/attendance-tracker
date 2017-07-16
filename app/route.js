@@ -216,6 +216,17 @@ module.exports = function(app){
     });
   });
 
+  // deleting lab attendance
+  app.get("/api/delete-att-lab", function(req, res){
+    AttendanceLab.remove({_id:req.query.id}, function(err, result){
+      if(err){
+        console.log(err);
+        res.send("Error : please contact hardik11.chauhan@gmail.com");
+      }
+      else res.send("Lab deleted successfully.");
+    });
+  });
+
   //getting attendance
     /* Getting attendance for home screen */
     app.get('/api/get-home-theory', function(req, res){

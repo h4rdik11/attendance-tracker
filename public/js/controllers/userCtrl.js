@@ -428,8 +428,15 @@ app.controller('UserController', function($scope, $http, $auth, $location, $q, $
     };
 
     $scope.delTheory = function(id,index){
-      $scope.edit_theory.splice(index,1);
       $http.get("/api/delete-att-theory?token="+$auth.getToken()+"&user="+$scope.loggedUser._id+"&id="+id).then(function(response){
+        $scope.edit_theory.splice(index,1);
+        $scope.callSnack(response.data);
+      });
+    }
+
+    $scope.delLab = function(id,index){
+      $http.get("/api/delete-att-lab?token="+$auth.getToken()+"&user="+$scope.loggedUser._id+"&id="+id).then(function(response){
+        $scope.edit_lab.splice(index,1);
         $scope.callSnack(response.data);
       });
     }
